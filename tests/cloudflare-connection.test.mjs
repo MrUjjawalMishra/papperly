@@ -75,3 +75,13 @@ it("does not inspect other resources after an account identity mismatch", async 
   ).rejects.toThrow("identity mismatch");
   expect(calls).toBe(1);
 });
+it("reports both absent GitHub settings without making any provider request", async () => {
+  let calls = 0;
+  await expect(
+    verifyCloudflareConnection({}, async () => {
+      calls++;
+      throw Error("must not run");
+    }),
+  ).rejects.toThrow("Neither Cloudflare setting reached this job");
+  expect(calls).toBe(0);
+});

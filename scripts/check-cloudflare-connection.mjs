@@ -8,9 +8,13 @@ export async function verifyCloudflareConnection(
   { accountId, token },
   fetcher = fetch,
 ) {
+  if (!accountId && !token?.trim())
+    throw Error(
+      "Neither Cloudflare setting reached this job. In MrUjjawalMishra/papperly > Settings > Environments > staging, save CLOUDFLARE_ACCOUNT_ID as a variable or secret and CLOUDFLARE_API_TOKEN as a secret.",
+    );
   if (!/^[a-f0-9]{32}$/i.test(accountId ?? ""))
     throw Error(
-      "Set the staging environment variable CLOUDFLARE_ACCOUNT_ID to the account's 32-character ID.",
+      "Set the staging environment variable or secret CLOUDFLARE_ACCOUNT_ID to the account's 32-character ID.",
     );
   if (!token?.trim())
     throw Error(
