@@ -76,7 +76,7 @@ perform public.submit_attempt(jsonb_build_object('attemptId',a->>'id','writer',a
 perform set_config('request.jwt.claim.sub','${ids.teacher}',true);
 for question in select content from public.exam_questions where version_id='${v}' and type='subjective'loop perform public.review_grade(jsonb_build_object('attemptId',a->>'id','questionId',question->>'id','score',300,'revision',1,'feedback','Synthetic teacher feedback','reason','Synthetic fixture'));end loop;
 result_id:=public.publish_result(jsonb_build_object('attemptId',a->>'id','reason','Synthetic result'));
-update public.results set published_at=now()-interval '21 days' where id=result_id;
+-- Current mixed-format assessment remains current for in-progress/unstarted fixtures.
 `);
 for (let i = 0; i < 2; i++) {
   const p = {
@@ -88,7 +88,7 @@ for (let i = 0; i < 2; i++) {
     closesAt: new Date(Date.now() + 3600000).toISOString(),
   };
   script.push(
-    `p:=${q(JSON.stringify(p))}::jsonb;ver:=public.publish_exam(p);perform set_config('request.jwt.claim.sub','${ids.student}',true);a:=public.start_attempt(jsonb_build_object('writer','${uid(999)}','versionId',ver));perform public.submit_attempt(jsonb_build_object('attemptId',a->>'id','writer',a->>'writer'));perform set_config('request.jwt.claim.sub','${ids.teacher}',true);for question in select content from public.exam_questions where version_id=ver and type='subjective'loop perform public.review_grade(jsonb_build_object('attemptId',a->>'id','questionId',question->>'id','score',${350 + i * 50},'revision',1,'feedback','Synthetic feedback','reason','Synthetic fixture'));end loop;result_id:=public.publish_result(jsonb_build_object('attemptId',a->>'id','reason','Synthetic result'));update public.results set published_at=now()-interval '${14 - i * 7} days'where id=result_id;`,
+    `p:=${q(JSON.stringify(p))}::jsonb;p:=p||jsonb_build_object('opensAt',now()-interval '1 hour','closesAt',now()+interval '12 hours');ver:=public.publish_exam(p);perform set_config('request.jwt.claim.sub','${ids.student}',true);a:=public.start_attempt(jsonb_build_object('writer','${uid(999)}','versionId',ver));perform public.submit_attempt(jsonb_build_object('attemptId',a->>'id','writer',a->>'writer'));perform set_config('request.jwt.claim.sub','${ids.teacher}',true);for question in select content from public.exam_questions where version_id=ver and type='subjective'loop perform public.review_grade(jsonb_build_object('attemptId',a->>'id','questionId',question->>'id','score',${350 + i * 50},'revision',1,'feedback','Synthetic feedback','reason','Synthetic fixture'));end loop;result_id:=public.publish_result(jsonb_build_object('attemptId',a->>'id','reason','Synthetic result'));update public.results set published_at=now()-interval '${14 - i * 7} days'where id=result_id;update public.exam_versions set opens_at=now()-interval '${14 - i * 7} days'-interval '1 hour',closes_at=now()-interval '${14 - i * 7} days'where id=ver;update public.exam_recipients set closes_at=now()-interval '${14 - i * 7} days'where version_id=ver;update public.attempts set started_at=now()-interval '${14 - i * 7} days'-interval '30 minutes',deadline=now()-interval '${14 - i * 7} days',finalized_at=now()-interval '${14 - i * 7} days'-interval '10 minutes'where version_id=ver;`,
   );
 }
 script.push(

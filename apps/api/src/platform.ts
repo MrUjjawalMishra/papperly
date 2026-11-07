@@ -35,8 +35,13 @@ export async function supabase(
   const response = await fetch(env.SUPABASE_URL + path, {
     method,
     headers: {
-      apikey: env.SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${token}`,
+      apikey:
+        token === env.SUPABASE_SERVICE_ROLE_KEY
+          ? env.SUPABASE_SERVICE_ROLE_KEY
+          : env.SUPABASE_ANON_KEY,
+      ...(/^(sb_publishable_|sb_secret_)/.test(token)
+        ? {}
+        : { Authorization: `Bearer ${token}` }),
       "Content-Type": "application/json",
     },
     body: body === undefined ? undefined : JSON.stringify(body),
