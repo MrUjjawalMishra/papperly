@@ -1,0 +1,38 @@
+{
+  "name": "papperly",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "node scripts/build.mjs",
+    "check:frontend": "node scripts/check-frontend.mjs",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "verify": "npm run lint && npm run typecheck && npm test && npm run check:frontend && npm run build"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.12.0",
+    "fflate": "^0.8.3",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261104.1",
+    "@electric-sql/pglite": "^0.3.14",
+    "@eslint/js": "^9.39.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.39.0",
+    "prettier": "^3.6.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^3.2.0",
+    "wrangler": "^4.45.0",
+    "zod-to-json-schema": "^3.25.2"
+  }
+}

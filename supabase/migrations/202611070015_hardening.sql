@@ -1,0 +1,7 @@
+-- Default-deny even if a later accidental private table grant is introduced.
+do $$declare r record;begin for r in select tablename from pg_tables where schemaname='private'loop execute format('alter table private.%I enable row level security',r.tablename);end loop;end$$;
+alter default privileges in schema public revoke execute on functions from public;
+alter default privileges in schema private revoke execute on functions from public;
+alter default privileges in schema public revoke all on tables from anon,authenticated;
+create function public.owner_usage(p jsonb)returns jsonb language plpgsql stable security definer set search_path='' as $$begin if private.role()<>'owner'then raise exception 'FORBIDDEN'using errcode='42501';end if;return (select coalesce(jsonb_agg(x),'[]')from(select s.id,s.name,s.status,(select count(*)from public.memberships where school_id=s.id and role='teacher'and active)as active_teachers,(select count(*)from public.memberships where school_id=s.id and role='student'and active)as active_students,(select count(*)from public.exam_versions where school_id=s.id)as exam_count,(select coalesce(sum(size),0)from public.attachments where school_id=s.id and charged and state<>'deleted')as storage_bytes from public.schools s order by s.id limit 100)x);end$$;
+revoke execute on function public.owner_usage(jsonb)from public,anon,authenticated;grant execute on function public.owner_usage(jsonb)to authenticated;

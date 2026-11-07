@@ -1,0 +1,67 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "papperly-api-development",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "vars": {
+    "ENVIRONMENT": "development",
+    "ALLOWED_ORIGINS": "http://localhost:5173",
+  },
+  "r2_buckets": [
+    { "binding": "FILES", "bucket_name": "papperly-development-private" },
+  ],
+  "queues": {
+    "producers": [{ "binding": "JOBS", "queue": "papperly-development-jobs" }],
+    "consumers": [
+      {
+        "queue": "papperly-development-jobs",
+        "max_batch_size": 10,
+        "max_retries": 3,
+      },
+    ],
+  },
+  "triggers": { "crons": ["* * * * *"] },
+  "env": {
+    "staging": {
+      "name": "papperly-api-staging",
+      "workers_dev": true,
+      "vars": { "ENVIRONMENT": "staging", "ALLOWED_ORIGINS": "" },
+      "r2_buckets": [
+        { "binding": "FILES", "bucket_name": "papperly-staging-private" },
+      ],
+      "queues": {
+        "producers": [{ "binding": "JOBS", "queue": "papperly-staging-jobs" }],
+        "consumers": [
+          {
+            "queue": "papperly-staging-jobs",
+            "max_batch_size": 10,
+            "max_retries": 3,
+          },
+        ],
+      },
+      "triggers": { "crons": ["* * * * *"] },
+    },
+    "production": {
+      "name": "papperly-api-production",
+      "workers_dev": false,
+      "vars": { "ENVIRONMENT": "production", "ALLOWED_ORIGINS": "" },
+      "r2_buckets": [
+        { "binding": "FILES", "bucket_name": "papperly-production-private" },
+      ],
+      "queues": {
+        "producers": [
+          { "binding": "JOBS", "queue": "papperly-production-jobs" },
+        ],
+        "consumers": [
+          {
+            "queue": "papperly-production-jobs",
+            "max_batch_size": 10,
+            "max_retries": 3,
+          },
+        ],
+      },
+      "triggers": { "crons": ["* * * * *"] },
+    },
+  },
+}

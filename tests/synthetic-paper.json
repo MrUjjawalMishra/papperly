@@ -1,0 +1,342 @@
+{
+  "title": "Class IX Computer Applications",
+  "subject": "Computing",
+  "instructions": "Synthetic test paper",
+  "rawText": "Synthetic fixture; no credentials",
+  "questions": [
+    {
+      "id": "40000000-0000-4000-8000-000000000001",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "mcq",
+      "options": [
+        {
+          "id": "40000000-0000-4000-8000-000000000100",
+          "text": "Correct"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000101",
+          "text": "Other"
+        }
+      ],
+      "shuffleOptions": true
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000002",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "mcq",
+      "options": [
+        {
+          "id": "40000000-0000-4000-8000-000000000102",
+          "text": "Correct"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000103",
+          "text": "Other"
+        }
+      ],
+      "shuffleOptions": true
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000003",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "mcq",
+      "options": [
+        {
+          "id": "40000000-0000-4000-8000-000000000104",
+          "text": "Correct"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000105",
+          "text": "Other"
+        }
+      ],
+      "shuffleOptions": true
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000004",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "mcq",
+      "options": [
+        {
+          "id": "40000000-0000-4000-8000-000000000106",
+          "text": "Correct"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000107",
+          "text": "Other"
+        }
+      ],
+      "shuffleOptions": true
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000005",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "mcq",
+      "options": [
+        {
+          "id": "40000000-0000-4000-8000-000000000108",
+          "text": "Correct"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000109",
+          "text": "Other"
+        }
+      ],
+      "shuffleOptions": true
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000006",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "boolean"
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000007",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "boolean"
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000008",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "boolean"
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000009",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 400,
+      "primaryTopic": "Computing",
+      "type": "match",
+      "left": [
+        {
+          "id": "40000000-0000-4000-8000-000000000200",
+          "text": "Input 0"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000201",
+          "text": "Input 1"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000202",
+          "text": "Input 2"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000203",
+          "text": "Input 3"
+        }
+      ],
+      "right": [
+        {
+          "id": "40000000-0000-4000-8000-000000000210",
+          "text": "Output 0"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000211",
+          "text": "Output 1"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000212",
+          "text": "Output 2"
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000213",
+          "text": "Output 3"
+        }
+      ]
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000010",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "blank",
+      "blanks": ["40000000-0000-4000-8000-000000000300"]
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000011",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "blank",
+      "blanks": ["40000000-0000-4000-8000-000000000301"]
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000012",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 100,
+      "primaryTopic": "Computing",
+      "type": "blank",
+      "blanks": ["40000000-0000-4000-8000-000000000302"]
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000013",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 500,
+      "primaryTopic": "Computing",
+      "type": "subjective"
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000014",
+      "prompt": "Synthetic computing question",
+      "section": "A",
+      "max": 500,
+      "primaryTopic": "Computing",
+      "type": "subjective"
+    }
+  ],
+  "keys": [
+    {
+      "questionId": "40000000-0000-4000-8000-000000000001",
+      "correct": "40000000-0000-4000-8000-000000000100"
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000002",
+      "correct": "40000000-0000-4000-8000-000000000102"
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000003",
+      "correct": "40000000-0000-4000-8000-000000000104"
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000004",
+      "correct": "40000000-0000-4000-8000-000000000106"
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000005",
+      "correct": "40000000-0000-4000-8000-000000000108"
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000006",
+      "correct": true
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000007",
+      "correct": true
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000008",
+      "correct": true
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000009",
+      "units": [
+        {
+          "id": "40000000-0000-4000-8000-000000000200",
+          "right": "40000000-0000-4000-8000-000000000210",
+          "max": 100
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000201",
+          "right": "40000000-0000-4000-8000-000000000211",
+          "max": 100
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000202",
+          "right": "40000000-0000-4000-8000-000000000212",
+          "max": 100
+        },
+        {
+          "id": "40000000-0000-4000-8000-000000000203",
+          "right": "40000000-0000-4000-8000-000000000213",
+          "max": 100
+        }
+      ]
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000010",
+      "units": [
+        {
+          "id": "40000000-0000-4000-8000-000000000300",
+          "max": 100,
+          "alternatives": ["CPU", "processor"]
+        }
+      ]
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000011",
+      "units": [
+        {
+          "id": "40000000-0000-4000-8000-000000000301",
+          "max": 100,
+          "alternatives": ["CPU", "processor"]
+        }
+      ]
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000012",
+      "units": [
+        {
+          "id": "40000000-0000-4000-8000-000000000302",
+          "max": 100,
+          "alternatives": ["CPU", "processor"]
+        }
+      ]
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000013",
+      "rubric": [
+        {
+          "id": "40000000-0000-4000-8000-000000000400",
+          "max": 500,
+          "description": "Explain accurately"
+        }
+      ],
+      "reference": "Teacher reference"
+    },
+    {
+      "questionId": "40000000-0000-4000-8000-000000000014",
+      "rubric": [
+        {
+          "id": "40000000-0000-4000-8000-000000000401",
+          "max": 500,
+          "description": "Explain accurately"
+        }
+      ],
+      "reference": "Teacher reference"
+    }
+  ],
+  "opensAt": "2026-11-07T09:37:08.027Z",
+  "closesAt": "2026-11-07T10:38:08.027Z",
+  "durationSeconds": 1800,
+  "lastStartAt": null,
+  "shuffle": true,
+  "recipients": [
+    {
+      "studentId": "20000000-0000-4000-8000-000000000003",
+      "extraSeconds": 0,
+      "closesAt": null
+    },
+    {
+      "studentId": "20000000-0000-4000-8000-000000000004",
+      "extraSeconds": 0,
+      "closesAt": null
+    }
+  ]
+}
