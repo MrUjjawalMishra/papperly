@@ -220,3 +220,26 @@ export async function credentialChange(env: Env, s: Session, input: unknown) {
     _cookie: undefined,
   };
 }
+export async function reconcileProvisioning(env: Env, id: string) {
+  const reservation = await rpc<{ id: string; state: string } | null>(
+    env,
+    "runtime_provision_claim",
+    { id },
+  );
+  if (!reservation) return;
+  try {
+    const auth = (await supabase(
+      env,
+      `/auth/v1/admin/users/${id}`,
+      env.SUPABASE_SERVICE_ROLE_KEY,
+    )) as { id?: string };
+    if (auth.id !== id) throw new ApiError(503, "AUTH_IDENTITY_MISMATCH");
+    await rpc(env, "runtime_provision_auth", { id });
+    await rpc(env, "runtime_provision_activate", { id });
+  } catch {
+    await rpc(env, "runtime_provision_failed", {
+      id,
+      code: "RECONCILIATION_REQUIRES_RETRY",
+    });
+  }
+}

@@ -365,3 +365,40 @@ it("rejects malformed publication even through direct authenticated RPC calls", 
     "INVALID_MCQ",
   );
 });
+it("reconciles lost upload completion and expires abandoned quota only once", async () => {
+  const g = await call<string>(db, ids.teacher, "create_group", {
+    classId: ids.class,
+    subject: "Computing",
+    title: "Files",
+  });
+  const post = await call<string>(db, ids.teacher, "write_post", {
+    groupId: g,
+    title: "File post",
+    body: "File material",
+  });
+  const a = await call<{ id: string }>(db, ids.teacher, "reserve_upload", {
+    postId: post,
+    filename: "synthetic.pdf",
+    type: "application/pdf",
+    size: 100,
+    checksum: "synthetic-checksum",
+  });
+  await db.query(
+    "update attachments set created_at=now()-interval '25 hours'where id=$1",
+    [a.id],
+  );
+  await db.query("select runtime_reconcile_upload($1::jsonb)", [
+    JSON.stringify({ id: a.id, exists: false }),
+  ]);
+  await db.query("select runtime_reconcile_upload($1::jsonb)", [
+    JSON.stringify({ id: a.id, exists: false }),
+  ]);
+  expect(
+    (
+      await db.query<{ state: string; charged: boolean }>(
+        "select state,charged from attachments where id=$1",
+        [a.id],
+      )
+    ).rows[0],
+  ).toEqual({ state: "deleted", charged: false });
+});

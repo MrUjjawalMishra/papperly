@@ -1,3 +1,4 @@
+import { reconcileProvisioning } from "./accounts";
 import { z } from "zod";
 import {
   guidance,
@@ -172,6 +173,8 @@ export async function consume(
       const code = e instanceof ApiError ? e.code : "INVALID_PROVIDER_OUTPUT";
       if (job.kind === "scan")
         await rpc(env, "runtime_scan_finish", {
+          jobId: job.id,
+          runToken: job.runToken,
           id: job.payload.attachmentId,
           checksum: job.payload.checksum,
           state: code.endsWith("NOT_CONFIGURED")
@@ -198,7 +201,25 @@ export async function consume(
 export async function scheduled(env: Env) {
   await rpc(env, "runtime_sweep", {});
   const expired = await rpc<string[]>(env, "runtime_cleanup", {});
-  for (const key of expired) await env.FILES.delete(key);
+  for (const key of expired) {
+    await env.FILES.delete(key);
+    await rpc(env, "runtime_deleted_export", { objectKey: key });
+  }
+  const provisions = await rpc<string[]>(
+    env,
+    "runtime_pending_provisioning",
+    {},
+  );
+  for (const id of provisions) await reconcileProvisioning(env, id);
+  const uploads = await rpc<{ id: string; object_key: string }[]>(
+    env,
+    "runtime_upload_candidates",
+    {},
+  );
+  for (const candidate of uploads) {
+    const exists = Boolean(await env.FILES.head(candidate.object_key));
+    await rpc(env, "runtime_reconcile_upload", { id: candidate.id, exists });
+  }
   const jobs = await rpc<{ id: string; kind: string }[]>(
     env,
     "runtime_dispatch",
@@ -234,6 +255,8 @@ async function scan(env: Env, job: Job) {
   if (result.checksum !== job.payload.checksum)
     throw new ApiError(503, "SCAN_CHECKSUM_MISMATCH");
   await rpc(env, "runtime_scan_finish", {
+    jobId: job.id,
+    runToken: job.runToken,
     id: job.payload.attachmentId,
     checksum: result.checksum,
     state: result.verdict === "clean" ? "clean" : "rejected",
