@@ -28,7 +28,7 @@ First release has no known-good application release. Capture one after successfu
 
 Before a real-data pilot, document the actual Supabase plan's backup/PITR capability and retention, export a protected backup, restore it into an isolated non-production target, verify row counts/constraints/RLS/auth links and application workflows, and reapply deletion tombstones. Supabase Auth and R2 need their own recovery reconciliation. No backup/restore test has run here. Never promise an automatic database rollback or zero data loss.
 
-Current precise blockers: no verified Cloudflare account/Worker identifiers, no Worker runtime/provider credentials, no permitted staging origin/alias/owner configuration, no selected AI/scanner, no approved provisioning budget, no live acceptance/restore/load evidence. CI configuration is source-prepared, not a verified automatic deployment.
+Current precise blockers: Cloudflare account/read access is verified, but no verified staging Worker/bucket/Queue exists; no Worker runtime/provider credentials, no permitted staging origin/alias/owner configuration, no selected AI/scanner, no approved provisioning budget, no live acceptance/restore/load evidence. CI configuration is source-prepared, not a verified automatic deployment.
 
 ## Current GitHub installation diagnosis
 
@@ -49,3 +49,7 @@ If this ChatGPT interface has no Apps/custom MCP settings, use docs/connect-clou
 ## Verified GitHub credential environment
 
 The supplied settings URL https://github.com/MrUjjawalMishra/papperly/settings/environments/26576187709/edit identifies the environment named Cloudflare, not staging. Public GitHub REST metadata (no credential values) confirmed both names/IDs. The connection-only workflow now binds to Cloudflare. The release workflow remains gated and still requires final credential binding/runtime configuration review before use. Do not rename/move secrets or relax environment protections merely to make a probe pass.
+
+## Cloudflare read access verified
+
+Connection run [42398928263](https://github.com/MrUjjawalMishra/papperly/actions/runs/42398928263) passed using GitHub environment Cloudflare (26576187709). Account e746f9041a0f5eddfd51c206531b3393 and Workers/R2/Queues read operations are verified; write scope remains unverified. The route was GitHub MCP orchestration → GitHub Actions → Cloudflare REST, not a Cloudflare MCP call. No matching staging resources appeared in the probe, no resources were created and no Worker was deployed. See cloudflare-connection-evidence.json. Historical missing-credential findings above are resolved for the probe. The gated release workflow still needs its credential environment aligned and runtime configuration supplied before use.

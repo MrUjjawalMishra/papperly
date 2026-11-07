@@ -1,0 +1,27 @@
+{
+  "accountId": "e746f9041a0f5eddfd51c206531b3393",
+  "checkedAt": "2026-11-07T17:58:44.307Z",
+  "mode": "read-only connection check",
+  "access": {
+    "account": true,
+    "workers": true,
+    "r2": true,
+    "queues": true
+  },
+  "workersSubdomain": "mr-ujjawalmishra",
+  "stagingCandidates": {
+    "worker": null,
+    "bucket": null,
+    "queue": null
+  },
+  "limitations": "Resource names are candidates, not approved deployment targets. Private access, write permissions, budget, bindings and the full backend release still need verification. No resources were created or modified.",
+  "githubCredentialEnvironment": "Cloudflare",
+  "githubCredentialEnvironmentId": 26576187709,
+  "runId": 42398928263,
+  "runUrl": "https://github.com/MrUjjawalMishra/papperly/actions/runs/42398928263",
+  "sourceSha": "2b4c54906595d13ddc862f3b3f50a0f97b170d14",
+  "conclusion": "success",
+  "route": "GitHub MCP orchestration; GitHub Actions read-only Cloudflare API requests",
+  "resourcesCreated": false,
+  "applicationDeployed": false
+}
