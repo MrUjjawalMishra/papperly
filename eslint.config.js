@@ -5,9 +5,15 @@ export default ts.config(
   js.configs.recommended,
   ...ts.configs.recommended,
   {
-    files: ["scripts/**/*.mjs"],
+    files: ["scripts/**/*.mjs", "tests/**/*.mjs"],
     languageOptions: {
-      globals: { fetch: "readonly", URL: "readonly", AbortSignal: "readonly" },
+      globals: {
+        fetch: "readonly",
+        URL: "readonly",
+        AbortSignal: "readonly",
+        Response: "readonly",
+        crypto: "readonly",
+      },
     },
   },
   { rules: { "@typescript-eslint/no-explicit-any": "error" } },

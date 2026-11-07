@@ -41,3 +41,7 @@ Cloudflare official MCP route verified from provider documentation: https://deve
 GitHub resolution: the owner added papperly to installation 126331485. A fresh repository-specific read confirmed access, the write error changed to empty-repository 409, and Git successfully pushed feat/backend-v1 at 1137da3962b2aee4a2f038dcdbc6b0512437e07f. MCP confirmed the exact ref and Actions run 42385021596. GitHub set the first branch as default; no main/staging branch was merged. Earlier 403 diagnosis above is retained as history, not a current blocker.
 
 CI verification: Backend validation run 42385021596 completed successfully for 1137da3962b2aee4a2f038dcdbc6b0512437e07f, including all 29 tests, format/lint/type checks, Worker dry-run, frontend absence and both secret scans. The subsequent documentation-only update uses the GitHub MCP tree/commit/ref operations. No staging deployment was triggered; Cloudflare credentials/target remain absent.
+
+## Browser-only credential setup fallback
+
+If this ChatGPT interface has no Apps/custom MCP settings, use docs/connect-cloudflare-without-terminal.md. A read-only Cloudflare connection workflow is prepared and uses environment-scoped GitHub credentials. The assistant controls the dedicated trigger branch via GitHub MCP, then monitors the actual job result. This avoids a terminal on the user's side without claiming a Cloudflare MCP connector exists. No auto deployment flag is enabled and no resources are provisioned by the check.
