@@ -15,7 +15,7 @@ Retention is provisional: academic year plus 90 days, audit metadata 12 months, 
 Operational recovery:
 
 - Outbox dispatched/processing leases recover after timeout. Completed jobs deduplicate; stale run tokens cannot commit generic job results. Inspect failed/unavailable state and error code without private payloads. Do not bypass review or RLS to clear a job.
-- Auth provisioning retries reserve the same UUID. Existing Auth users are inspected, not reset. After Auth succeeds and database activation fails, retry activation; an issued credential response lost in transit requires an authorized reset. Automatic background orphan reconciliation is still pending.
-- R2 upload failure leaves quarantine metadata/quota reserved. Abandoned-object/metadata reconciliation and safe quota release are still pending; do not manually mark an unscanned object clean.
+- Auth provisioning retries reserve the same UUID. Existing Auth users are inspected, not reset. After Auth succeeds and database activation fails, retry activation; an issued credential response lost in transit requires an authorized reset. Scheduled reconciliation now activates reserved Auth identities that exist; missing Auth identities stay reserved for an explicit authorized retry/reset, never silently recreated with an undisclosed credential.
+- R2 upload failure leaves quarantine metadata/quota reserved. Scheduled reconciliation repairs lost completion and releases quota for missing objects after 24 hours; do not manually mark an unscanned object clean.
 - If a migration partially fails, inspect migration history and actual objects, determine transaction outcome, then forward-fix. Do not rerun destructive SQL or drop a live schema.
 - Worker rollback requires compatibility with current schema; capture the previous successful deployment ID first. Backup/restore rehearsal is required before real student data and has not been completed.
