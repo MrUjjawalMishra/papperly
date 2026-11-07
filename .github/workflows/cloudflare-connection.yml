@@ -12,7 +12,7 @@ jobs:
   verify-access:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    environment: staging
+    environment: Cloudflare
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

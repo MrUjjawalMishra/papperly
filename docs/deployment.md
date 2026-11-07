@@ -45,3 +45,7 @@ CI verification: Backend validation run 42385021596 completed successfully for 1
 ## Browser-only credential setup fallback
 
 If this ChatGPT interface has no Apps/custom MCP settings, use docs/connect-cloudflare-without-terminal.md. A read-only Cloudflare connection workflow is prepared and uses environment-scoped GitHub credentials. The assistant controls the dedicated trigger branch via GitHub MCP, then monitors the actual job result. This avoids a terminal on the user's side without claiming a Cloudflare MCP connector exists. No auto deployment flag is enabled and no resources are provisioned by the check.
+
+## Verified GitHub credential environment
+
+The supplied settings URL https://github.com/MrUjjawalMishra/papperly/settings/environments/26576187709/edit identifies the environment named Cloudflare, not staging. Public GitHub REST metadata (no credential values) confirmed both names/IDs. The connection-only workflow now binds to Cloudflare. The release workflow remains gated and still requires final credential binding/runtime configuration review before use. Do not rename/move secrets or relax environment protections merely to make a probe pass.

@@ -5,5 +5,7 @@
   "apiUrl": null,
   "verified": false,
   "supabaseVerified": true,
-  "supabaseApiUrl": "https://soudjtewvquywncqtwyo.supabase.co"
+  "supabaseApiUrl": "https://soudjtewvquywncqtwyo.supabase.co",
+  "githubCredentialEnvironment": "Cloudflare",
+  "githubCredentialEnvironmentId": 26576187709
 }

@@ -2,9 +2,9 @@
 
 ChatGPT Apps/Developer Mode is not required for this route. GitHub and Supabase are already connected. GitHub Actions will make Cloudflare API calls; the assistant uses GitHub MCP to start the connection check through a dedicated branch and inspect its result. This is an authorized API/CI fallback, not a Cloudflare MCP connection.
 
-## 1. Create the staging environment in GitHub
+## 1. Open the existing GitHub credential environment
 
-Open https://github.com/MrUjjawalMishra/papperly/settings/environments . Choose New environment, enter `staging`, then configure it. If it already exists, open it. You do not need a terminal.
+Open https://github.com/MrUjjawalMishra/papperly/settings/environments . For this project, open the existing environment named `Cloudflare` (ID 26576187709). It contains the credentials supplied by the user. The application target is still staging; the GitHub credential environment has a different label. You do not need a terminal.
 
 Keep deployment credentials in this environment, not in source or pull-request code. Do not enable ENABLE_STAGING_AUTODEPLOY yet. The deployment target/budget/runtime configuration and remaining acceptance work are not complete.
 
@@ -12,7 +12,7 @@ Keep deployment credentials in this environment, not in source or pull-request c
 
 Sign in at https://dash.cloudflare.com/ and select the account intended for Papperly staging. Use the dashboard's Account ID/Copy account ID control. It is a 32-character identifier, not an API token. Do not copy a Zone ID.
 
-In GitHub's staging environment, under Environment variables, choose Add environment variable:
+In GitHub's `Cloudflare` environment, under Environment variables, choose Add environment variable:
 
 - Name: `CLOUDFLARE_ACCOUNT_ID`
 - Value: that account ID.
@@ -38,7 +38,7 @@ Review the scope, create the token, and copy it once.
 
 ## 4. Store the token as a GitHub environment secret
 
-Return to the staging environment in GitHub. Under Environment secrets, choose Add environment secret:
+Return to the `Cloudflare` environment in GitHub. Under Environment secrets, choose Add environment secret:
 
 - Name: `CLOUDFLARE_API_TOKEN`
 - Value: the token copied from Cloudflare.

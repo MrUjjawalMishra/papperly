@@ -49,7 +49,7 @@ it("fails closed before network access when credentials are missing", async () =
   };
   await expect(
     verifyCloudflareConnection({ accountId, token: "" }, fetcher),
-  ).rejects.toThrow("staging environment secret");
+  ).rejects.toThrow("workflow environment secret");
   await expect(
     verifyCloudflareConnection({ accountId: "invalid", token }, fetcher),
   ).rejects.toThrow("32-character");

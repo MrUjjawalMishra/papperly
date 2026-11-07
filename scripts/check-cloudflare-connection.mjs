@@ -10,15 +10,15 @@ export async function verifyCloudflareConnection(
 ) {
   if (!accountId && !token?.trim())
     throw Error(
-      "Neither Cloudflare setting reached this job. In MrUjjawalMishra/papperly > Settings > Environments > staging, save CLOUDFLARE_ACCOUNT_ID as a variable or secret and CLOUDFLARE_API_TOKEN as a secret.",
+      "Neither Cloudflare setting reached this job. In the GitHub environment selected by this workflow, save CLOUDFLARE_ACCOUNT_ID as a variable or secret and CLOUDFLARE_API_TOKEN as a secret.",
     );
   if (!/^[a-f0-9]{32}$/i.test(accountId ?? ""))
     throw Error(
-      "Set the staging environment variable or secret CLOUDFLARE_ACCOUNT_ID to the account's 32-character ID.",
+      "Set the workflow environment variable or secret CLOUDFLARE_ACCOUNT_ID to the account's 32-character ID.",
     );
   if (!token?.trim())
     throw Error(
-      "Set the staging environment secret CLOUDFLARE_API_TOKEN. Never put it in source or logs.",
+      "Set the workflow environment secret CLOUDFLARE_API_TOKEN. Never put it in source or logs.",
     );
   async function read(path, label) {
     let response;
