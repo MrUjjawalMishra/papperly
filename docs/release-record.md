@@ -1,22 +1,31 @@
-# Release and handoff record — 2026-11-07
+# Current staging database release record — 2026-11-07
 
-Environment: local managed execution workspace. **No staging or production deployment exists.**
+Papperly's database schema is applied to the user-confirmed Supabase staging project. The Cloudflare application is not deployed, and full Version 1 acceptance remains incomplete.
 
-- Intended repository: https://github.com/MrUjjawalMishra/papperly
-- Local branch: feat/backend-v1
-- Tested application source commit: bc862b7d2f7731730c3d187a7987d909a955de57
-- Earlier coherent commits: 3a5e76ec927580f8e87242f40db236cc4be827ec (backend/tests), e9ca7908097f038c77da5afb430ccfbf995a87ab (contracts/docs/CI).
-- Latest migration supplied: 202611070022_answer_validation.sql. All 22 migrations replay locally; **none applied to a managed Supabase target**.
-- Final local gates: 26 tests/6 suites passed; ESLint, TypeScript, frontend absence, formatting, Worker staging dry-run build, credential-pattern scan passed. A redacted gitleaks 8.24.3 scan of tracked source also passed; binary checksum checked against official release checksums. The final history/source scan is performed after committing this record.
-- Local workerd smoke: /healthz 200, /readyz 503 when unconfigured, /v1/results 401 when anonymous.
-- Local diagnostic load: 50 synthetic students/two schools, zero observed failures, 100 outbox jobs, combined queued save+submit p95 about 917 ms. This is a serialized embedded-database diagnostic and **not** the PRD staging concurrency target.
-- Git CLI fallback: feature-branch commits created successfully; push returned 403 permission denied. No force push or history rewrite attempted.
-- GitHub MCP: connected login/repository metadata/branch list verified. Metadata reports push/admin, but blob-write returned 403 Resource not accessible by integration. No remote source or feature branch exists. Minimum connection change: repository Contents read/write and workflow-file write; Actions read for outcome inspection. No broader administrator access is needed.
-- Cloudflare/Supabase MCP: no service connector tools exposed. Wrangler/Supabase CLI routes are documented, but account/project targets and secure credentials are absent. Environment readiness repeatedly reports no variables/secrets/identities configured.
-- Automatic deployment: guarded Actions source prepared; not enabled, triggered, or tested. Target JSON remains verified=false; deployment cannot pass identity checks with placeholders. No remote CI run exists because push is blocked.
-- Release URL / deployment ID / live migration state / live smoke: unavailable; no deployment attempted.
-- Previous known-good release: none. Recovery instructions in deployment.md/setup.md; database recovery needs forward fix or separately authorized restoration, not blind rollback/reset.
+| Field                                   | Verified value                                                                                                            |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Supabase project                        | Papperly / soudjtewvquywncqtwyo                                                                                           |
+| Organization                            | Ujjawal Mishra / llccfqasogvlphhwgnvn                                                                                     |
+| Region / database                       | ap-northeast-1 / PostgreSQL 17.11                                                                                         |
+| Database API URL                        | https://soudjtewvquywncqtwyo.supabase.co — not the Papperly Worker URL                                                    |
+| Migrations                              | 22 applied through Supabase MCP; latest version 20261107142655                                                            |
+| Source baseline                         | 28d1f1f31886b4e79fb06320f1bf11db48a21f92; canonical filenames/provenance recorded in the subsequent local commit          |
+| Migration integrity                     | All 22 source SQL SHA-256 hashes match migration-provenance.json; only filenames changed to provider-assigned versions    |
+| RLS coverage                            | 60 application tables; RLS enabled on all 60                                                                              |
+| Native SQL checks                       | 21 assertions passed using authenticated/anon database roles and transaction-local claims; all synthetic data rolled back |
+| Data API checks                         | Four passed: public directory 200, anonymous results 401, service dispatcher 401, private schema 406                      |
+| Local regression                        | 29 tests/eight suites; lint, TypeScript, formatting, frontend-absence and Worker dry-run build passed                     |
+| Git repository / branch                 | MrUjjawalMishra/papperly / feat/backend-v1; commits remain local because writes return 403                                |
+| Cloudflare release URL / deployment ID  | None                                                                                                                      |
+| Automatic CI deployment                 | Workflow source prepared; not enabled, triggered or verified                                                              |
+| Previous known-good application release | None                                                                                                                      |
 
-Independent implementation/acceptance gaps are listed per FR in backend-requirements.md. This handoff does not claim Version 1 is complete. AI/scanner providers, managed Auth, R2/Queue/cron, native concurrency, full mixed-load pilot and restore rehearsal remain unverified. Production promotion and paid resource creation remain unauthorized.
+Evidence: supabase-staging-evidence.json, supabase-http-smoke.json, supabase/migration-provenance.json and tests/live/rls-checks.sql. Database TypeScript types were generated from the live schema. The private schema remains outside the exposed Data API schemas. No real users, reusable credentials or student records were provisioned.
 
-The requested chat-output directory is read-only in this executor, so source remains in the working repository; archive/bundle packaging can be kept under work until a writable artifact output or authorized repository push is available. Do not claim a download link exists when it does not.
+A native SQL test initially retained the previous user claim while switching to anon. The harness was corrected to clear claims; no application authorization was weakened. A later local WASM test exceeded the old five-second harness timeout. Suites now run without file parallelism and with a 15-second test budget, independently of the unpassed staging performance target.
+
+The default rls_auto_enable event-trigger helper no longer has anonymous execution permission. Supabase still reports informational default-deny private tables and warnings for intentionally callable checked RPCs. These are reviewed/documented, not silently treated as a clean advisory report. Guidance: https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy and https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable and https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable . Exhaustive RPC authorization coverage remains a Version 1 gate.
+
+Remaining external blockers: GitHub Contents/workflow-file write permission; verified Cloudflare account/Worker bindings and scoped deployment token; server-side Supabase secret key in secure runtime settings; Auth configuration/initial owner setup; provider selection and approved budget/retention. No server secret is retrievable through the exposed Supabase tools. Supabase MCP handles database operations now; unattended GitHub CI will still require its own securely scoped credentials.
+
+Recovery: do not rerun the original migration filenames or reset the project. The canonical migration versions now match Supabase history. Future schema changes use additive migrations/forward fixes. There is no application release to roll back. Backup/restore rehearsal, live Auth/Worker sessions, private R2/Queue/cron/scanner behavior, and the 50-examinee mixed-load target remain unverified. Full implementation gaps remain in backend-requirements.md. Earlier local-only records are retained under docs/history.

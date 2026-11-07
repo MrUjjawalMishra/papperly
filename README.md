@@ -1,6 +1,6 @@
 # Papperly — Version 1 backend
 
-Backend-only TypeScript/Cloudflare Worker monorepo with Supabase PostgreSQL migrations, private R2/Queues adapters, synthetic fixtures, API contracts and automated local tests. **Version 1 acceptance is not complete and no live deployment exists.** See docs/backend-status.md and docs/backend-requirements.md for exact scope and gaps.
+Backend-only TypeScript/Cloudflare Worker monorepo with Supabase PostgreSQL migrations, private R2/Queues adapters, synthetic fixtures, API contracts and automated local tests. **Version 1 acceptance is not complete. Supabase staging schema is applied and database boundaries have live verification; no Cloudflare application is deployed.** See docs/backend-status.md and docs/backend-requirements.md for exact scope and gaps.
 
 Requires Node 24 and npm. From repository root:
 

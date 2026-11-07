@@ -1,0 +1,31 @@
+{
+  "environment": "Supabase staging Data API; anonymous publishable key only",
+  "projectId": "soudjtewvquywncqtwyo",
+  "results": [
+    {
+      "case": "public_directory",
+      "status": 200,
+      "passed": true,
+      "errorCode": null
+    },
+    {
+      "case": "anonymous_results_denied",
+      "status": 401,
+      "passed": true,
+      "errorCode": "42501"
+    },
+    {
+      "case": "service_rpc_denied",
+      "status": 401,
+      "passed": true,
+      "errorCode": "42501"
+    },
+    {
+      "case": "private_schema_not_exposed",
+      "status": 406,
+      "passed": true,
+      "errorCode": "PGRST106"
+    }
+  ],
+  "limitations": "Does not verify live user Auth, Worker sessions, R2/Queues or concurrency."
+}

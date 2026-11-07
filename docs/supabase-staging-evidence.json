@@ -1,0 +1,51 @@
+{
+  "projectId": "soudjtewvquywncqtwyo",
+  "environment": "staging",
+  "databaseApiUrl": "https://soudjtewvquywncqtwyo.supabase.co",
+  "databaseVersion": "PostgreSQL 17.11",
+  "applicationTables": 60,
+  "rlsEnabledTables": 60,
+  "appliedMigrations": 22,
+  "lastMigrationVersion": "20261107142655",
+  "sqlRoleVerification": {
+    "status": "passed",
+    "assertions": 21,
+    "roles": ["authenticated", "anon"],
+    "syntheticRowsRemaining": 0,
+    "notes": "Native Supabase PostgreSQL with transaction-local claims/roles and rolled-back synthetic fixtures. Not live Auth/HTTP or concurrent-load verification."
+  },
+  "initialHarnessFailure": "Anonymous role retained previous JWT sub in test setup; corrected by clearing claims. No product permissions relaxed.",
+  "advisors": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 13,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+      "classification": "Intentional default-deny on private tables; clients have no policies"
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 2,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable",
+      "classification": "Explicit approved-public directory/profile projections only"
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 69,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+      "classification": "Checked authenticated RPCs; authorization regression coverage still incomplete"
+    }
+  ],
+  "workerDeployment": null,
+  "githubPush": "Blocked: integration write 403",
+  "localTests": {
+    "passed": 29,
+    "suites": 8
+  },
+  "anonymousDataApiSmoke": {
+    "passed": 4,
+    "evidence": "supabase-http-smoke.json"
+  }
+}

@@ -53,4 +53,6 @@ s+='revoke execute on all functions in schema public from public, anon, authenti
 rpcs=['create_class','assign_teacher','publish_exam','start_attempt','save_answer','submit_attempt','review_grade','review_details','publish_result','create_group','set_group_member','write_post','set_query_policy','create_query','reply_query','transition_query','revise_deadline','write_article','moderate_article','directory','student_progress']
 s+='grant execute on function '+','.join('public.'+r+'(jsonb)' for r in rpcs)+' to authenticated;\ngrant execute on function public.directory(jsonb) to anon;\n'
 s+='grant all on all tables in schema public to service_role;\ngrant usage on schema private to service_role;\ngrant all on all tables in schema private to service_role;\ngrant usage, select on all sequences in schema public,private to service_role;\n'
-Path('supabase/migrations/202611070005_rls.sql').write_text(s)
+migration_paths=list(Path('supabase/migrations').glob('*_rls.sql'))
+if len(migration_paths)!=1: raise RuntimeError('Expected one canonical RLS migration')
+migration_paths[0].write_text(s)

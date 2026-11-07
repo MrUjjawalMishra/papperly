@@ -1,7 +1,9 @@
 {
   "repository": "MrUjjawalMishra/papperly",
   "cloudflareAccountId": null,
-  "supabaseProjectRef": null,
+  "supabaseProjectRef": "soudjtewvquywncqtwyo",
   "apiUrl": null,
-  "verified": false
+  "verified": false,
+  "supabaseVerified": true,
+  "supabaseApiUrl": "https://soudjtewvquywncqtwyo.supabase.co"
 }

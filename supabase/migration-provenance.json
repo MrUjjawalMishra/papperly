@@ -1,0 +1,162 @@
+{
+  "projectId": "soudjtewvquywncqtwyo",
+  "environment": "staging",
+  "sourceCommit": "28d1f1f31886b4e79fb06320f1bf11db48a21f92",
+  "route": "Supabase MCP apply_migration",
+  "migrations": [
+    {
+      "file": "202611070001_foundation.sql",
+      "name": "papperly_202611070001_foundation",
+      "sha256": "581cb1e203c13964d62b0895429a3616e740e0257be5aedddf23909adbdad60f",
+      "providerVersion": "20261107142032",
+      "canonicalFile": "20261107142032_papperly_202611070001_foundation.sql"
+    },
+    {
+      "file": "202611070002_exams.sql",
+      "name": "papperly_202611070002_exams",
+      "sha256": "442736824284ab937b5db79f1c6ac40cdb0b7ac813c6479147054312defeca1d",
+      "providerVersion": "20261107142056",
+      "canonicalFile": "20261107142056_papperly_202611070002_exams.sql"
+    },
+    {
+      "file": "202611070003_learning.sql",
+      "name": "papperly_202611070003_learning",
+      "sha256": "77ee5d4894e4ed59a9154dbce09513847970856e5259c485d6778198015661a3",
+      "providerVersion": "20261107142105",
+      "canonicalFile": "20261107142105_papperly_202611070003_learning.sql"
+    },
+    {
+      "file": "202611070004_reports_directory.sql",
+      "name": "papperly_202611070004_reports_directory",
+      "sha256": "b11dbd27269285d6f915ab7a6c32c090a01043b2d7c8a3143a2478a8602f0176",
+      "providerVersion": "20261107142115",
+      "canonicalFile": "20261107142115_papperly_202611070004_reports_directory.sql"
+    },
+    {
+      "file": "202611070005_rls.sql",
+      "name": "papperly_202611070005_rls",
+      "sha256": "1b92f027abb6aa90fdbb4595a3a3561bdf6fd88010315973c0c9852dccab1df5",
+      "providerVersion": "20261107142125",
+      "canonicalFile": "20261107142125_papperly_202611070005_rls.sql"
+    },
+    {
+      "file": "202611070006_runtime.sql",
+      "name": "papperly_202611070006_runtime",
+      "sha256": "f2de46563f7b832f4ca191a26880db25cc9010ef38b910c775efe4d0cf5d0837",
+      "providerVersion": "20261107142151",
+      "canonicalFile": "20261107142151_papperly_202611070006_runtime.sql"
+    },
+    {
+      "file": "202611070007_management.sql",
+      "name": "papperly_202611070007_management",
+      "sha256": "46b53eb05701c33c093e615303f409f6cffc73d76195bf201a769aa522fa2ace",
+      "providerVersion": "20261107142208",
+      "canonicalFile": "20261107142208_papperly_202611070007_management.sql"
+    },
+    {
+      "file": "202611070008_provisioning.sql",
+      "name": "papperly_202611070008_provisioning",
+      "sha256": "98f589992b5476fe0dc225a9d6b98c21a047da1c68c7723e9e065d0d249fef4e",
+      "providerVersion": "20261107142219",
+      "canonicalFile": "20261107142219_papperly_202611070008_provisioning.sql"
+    },
+    {
+      "file": "202611070009_account_security.sql",
+      "name": "papperly_202611070009_account_security",
+      "sha256": "c58fb2760d3f06d3f16276549d16b8eb11094120a79e0f30fffe6bb772de9531",
+      "providerVersion": "20261107142229",
+      "canonicalFile": "20261107142229_papperly_202611070009_account_security.sql"
+    },
+    {
+      "file": "202611070010_imports.sql",
+      "name": "papperly_202611070010_imports",
+      "sha256": "8bd82c8c8dfc9bb2a861797fbca587357ea2f2a73c68a96e3badab6dcdd19946",
+      "providerVersion": "20261107142239",
+      "canonicalFile": "20261107142239_papperly_202611070010_imports.sql"
+    },
+    {
+      "file": "202611070011_attachments.sql",
+      "name": "papperly_202611070011_attachments",
+      "sha256": "e23d85b803551d67a88452494595341777e0b6b77b54ae7ce71f2fbf6a569d05",
+      "providerVersion": "20261107142248",
+      "canonicalFile": "20261107142248_papperly_202611070011_attachments.sql"
+    },
+    {
+      "file": "202611070012_profiles_reports.sql",
+      "name": "papperly_202611070012_profiles_reports",
+      "sha256": "cd993367d23f9b38264d6a3691c3489be746d02bec3e203970690c3483c79ee3",
+      "providerVersion": "20261107142258",
+      "canonicalFile": "20261107142258_papperly_202611070012_profiles_reports.sql"
+    },
+    {
+      "file": "202611070013_consistency.sql",
+      "name": "papperly_202611070013_consistency",
+      "sha256": "e0ea374215053b2f700fbdc0abd91f54d4a5d3028ecb54a5fe8efe612ea7ba79",
+      "providerVersion": "20261107142455",
+      "canonicalFile": "20261107142455_papperly_202611070013_consistency.sql"
+    },
+    {
+      "file": "202611070014_background_authoring.sql",
+      "name": "papperly_202611070014_background_authoring",
+      "sha256": "0031adf7a4d36650ff7b38fb8f4a5a8ba26421768d877650922e8d9f63ab282b",
+      "providerVersion": "20261107142503",
+      "canonicalFile": "20261107142503_papperly_202611070014_background_authoring.sql"
+    },
+    {
+      "file": "202611070015_hardening.sql",
+      "name": "papperly_202611070015_hardening",
+      "sha256": "a6d18c0948ff5a667165407c15000ac5c6dcf3a7b86c0658a4a0223b4da452c9",
+      "providerVersion": "20261107142536",
+      "canonicalFile": "20261107142536_papperly_202611070015_hardening.sql"
+    },
+    {
+      "file": "202611070016_writer_leases.sql",
+      "name": "papperly_202611070016_writer_leases",
+      "sha256": "b446e23162c23733c87f0565162cf793132c6227996e547ec219207c920180c8",
+      "providerVersion": "20261107142550",
+      "canonicalFile": "20261107142550_papperly_202611070016_writer_leases.sql"
+    },
+    {
+      "file": "202611070017_publication_validation.sql",
+      "name": "papperly_202611070017_publication_validation",
+      "sha256": "bf5dfd1dda0d6d2c87ab9c83fd9399b6f5b3b0943fe463c7d3995819b57677a8",
+      "providerVersion": "20261107142600",
+      "canonicalFile": "20261107142600_papperly_202611070017_publication_validation.sql"
+    },
+    {
+      "file": "202611070018_extended_operations.sql",
+      "name": "papperly_202611070018_extended_operations",
+      "sha256": "61656eb177c61f998238f8d022abd048d023f4aad54e8b1a59abfbd886e8a79f",
+      "providerVersion": "20261107142611",
+      "canonicalFile": "20261107142611_papperly_202611070018_extended_operations.sql"
+    },
+    {
+      "file": "202611070019_query_fallback.sql",
+      "name": "papperly_202611070019_query_fallback",
+      "sha256": "e4961e099dba1c6e7046a52e21f9b5d3ecfc798b319dad2126b0a7eff79534fa",
+      "providerVersion": "20261107142622",
+      "canonicalFile": "20261107142622_papperly_202611070019_query_fallback.sql"
+    },
+    {
+      "file": "202611070020_search.sql",
+      "name": "papperly_202611070020_search",
+      "sha256": "ec247e67a3f583e1d860251cb217e28f1e65114aae7d9b380ddcf7a72fa10086",
+      "providerVersion": "20261107142631",
+      "canonicalFile": "20261107142631_papperly_202611070020_search.sql"
+    },
+    {
+      "file": "202611070021_reconciliation.sql",
+      "name": "papperly_202611070021_reconciliation",
+      "sha256": "94aa1dcf8fd5a81492d69130cf2009ce612441b4cb5e82b07f1a5f929528a393",
+      "providerVersion": "20261107142644",
+      "canonicalFile": "20261107142644_papperly_202611070021_reconciliation.sql"
+    },
+    {
+      "file": "202611070022_answer_validation.sql",
+      "name": "papperly_202611070022_answer_validation",
+      "sha256": "0b48648a996812951054a9e4af672902de879e308d36f942e0832a8a91d54c6b",
+      "providerVersion": "20261107142655",
+      "canonicalFile": "20261107142655_papperly_202611070022_answer_validation.sql"
+    }
+  ]
+}
