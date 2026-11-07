@@ -1,0 +1,60 @@
+name: Staging backend release
+on:
+  push:
+    branches: [staging]
+permissions:
+  contents: read
+concurrency:
+  group: papperly-staging-release
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run verify
+      - run: node scripts/scan-secrets.mjs
+      - run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 detect --source=/repo --no-git --redact --exit-code=1
+  deploy:
+    needs: validate
+    if: vars.ENABLE_STAGING_AUTODEPLOY == 'true'
+    environment: staging
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      STAGING_API_URL: ${{ vars.STAGING_API_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: node scripts/verify-targets.mjs
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.75.0
+      - name: Inspect pending migrations on the verified project
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase db push --linked --dry-run
+      - name: Apply additive migrations serially
+        run: supabase db push --linked
+      - name: Deploy exact checked-out commit
+        run: npx wrangler deploy --config apps/api/wrangler.jsonc --env staging --var "RELEASE_SHA:${GITHUB_SHA}" --var "ALLOWED_ORIGINS:${ALLOWED_ORIGINS}"
+        env:
+          ALLOWED_ORIGINS: ${{ vars.ALLOWED_ORIGINS }}
+      - name: Verify release identity and readiness
+        run: node scripts/live-smoke.mjs
+        env:
+          EXPECTED_RELEASE_SHA: ${{ github.sha }}

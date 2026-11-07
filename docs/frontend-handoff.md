@@ -1,0 +1,13 @@
+# Backend integration handoff — no visual design
+
+Use docs/openapi.json, packages/contracts/src/index.ts, docs/api.md and runtime schemas in apps/api/src/routes.ts. Do not build against live endpoints yet: no staging deployment exists. apps/web is a README placeholder.
+
+Authentication uses same-site Secure HttpOnly cookies plus a returned CSRF token, controlled origins, explicit logout and absolute/idle expiry. Use credentialed HTTPS fetch. The frontend must never handle Supabase service keys or provider tokens. Preserve the CSRF token only in session-scoped storage and clear it on logout. Self-password change issues a fresh application session and CSRF token. See backend-status.md before pilot integration.
+
+Attempts use immutable version IDs, question/option/pair IDs, a client-generated per-tab writer UUID, and per-question monotonically increasing revisions. Keep the writer UUID for refresh resume; explicit takeover reauthenticates and preserves deadline. Only a successful server response acknowledges an answer. Store unsynced work under the current immutable user/attempt identity, sync only before server deadline, and clear on confirmed finalization/logout. Client time and advisory focus events do not change admission, saves, marks or expiry. Store display order from the attempt; do not recompute scoring from display numbering.
+
+Expected machine states: unauthenticated/session-expired/password-change-required/CSRF-rejected; pending subscription/security suspension; draft/published/closed/archived exam; in_progress/submitted/expired attempt; pending/processing/unavailable/failed/done job; pending/active/rejected/removed membership; quarantined/scanning/clean/rejected/unavailable attachment; open/in_progress/answered/resolved/withdrawn query plus computed overdue; updating/ready/corrected/suppressed/unavailable insight; draft/submitted/changes_requested/approved article revision and separately visible published revision.
+
+Published scores are integer hundredths and metrics may be null when evidence is absent. Do not render missing scores as zero. Render teacher/student text as untrusted text or sanitized Markdown. Keep public profile DTOs separate from internal reports. No student private data belongs in public profiles, analytics caches, logs or error telemetry. A stale notification or file link still requires current authorization.
+
+During an active attempt, learning support endpoints restrict access. A browser cannot block external websites/devices. No comments, reactions, ratings, followers, popularity feed, public student profile, webcam or call APIs are planned for this version.

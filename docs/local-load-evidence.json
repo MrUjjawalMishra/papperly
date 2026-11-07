@@ -1,0 +1,12 @@
+{
+  "environment": "Node 24 / PGlite PostgreSQL WASM, one serialized connection, no HTTP/Cloudflare/provider services",
+  "students": 50,
+  "schools": 2,
+  "totalMilliseconds": 974.4862179999991,
+  "p50QueuedWorkflowMilliseconds": 403.8857250000001,
+  "p95QueuedWorkflowMilliseconds": 917.4879879999999,
+  "p99QueuedWorkflowMilliseconds": 952.5715870000004,
+  "failures": [],
+  "backgroundJobs": 100,
+  "limitations": "Save+submit combined per student, includes local queue wait. No parallel native sessions, network, imports, scanner, or AI; not the PRD pilot and not evidence the under-2-second target passed."
+}

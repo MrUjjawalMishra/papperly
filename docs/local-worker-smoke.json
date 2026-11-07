@@ -1,0 +1,38 @@
+{
+  "environment": "Wrangler/workerd local; no provider configuration",
+  "results": [
+    {
+      "path": "/healthz",
+      "expected": 200,
+      "actual": 200,
+      "body": {
+        "status": "ok",
+        "release": "local"
+      }
+    },
+    {
+      "path": "/readyz",
+      "expected": 503,
+      "actual": 503,
+      "body": {
+        "error": {
+          "code": "NOT_CONFIGURED",
+          "message": "NOT_CONFIGURED",
+          "requestId": "7e019944-1829-40b0-8cef-78be5bf64b09"
+        }
+      }
+    },
+    {
+      "path": "/v1/results",
+      "expected": 401,
+      "actual": 401,
+      "body": {
+        "error": {
+          "code": "UNAUTHENTICATED",
+          "message": "UNAUTHENTICATED",
+          "requestId": "3bd9502b-820b-4b1d-9c0b-b96e65d8a7da"
+        }
+      }
+    }
+  ]
+}

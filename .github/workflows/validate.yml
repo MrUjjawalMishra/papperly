@@ -1,0 +1,22 @@
+name: Backend validation
+on:
+  pull_request:
+  push:
+    branches: [main, staging, "feat/**"]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run verify
+      - run: node scripts/scan-secrets.mjs
+      - name: Scan tracked source and history without credentials
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 detect --source=/repo --no-git --redact --exit-code=1

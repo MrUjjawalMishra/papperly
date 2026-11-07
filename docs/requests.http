@@ -1,0 +1,99 @@
+# Scriptable requests for REST Client or translate directly to curl.
+# Supply real values through secure local environment settings; never commit them.
+@base = https://STAGING_WORKER_HOST
+@schoolCode = FICTIONAL_SCHOOL_CODE
+@loginId = ISSUED_LOGIN_ID
+@password = ENVIRONMENT_SECRET
+@csrf = TOKEN_RETURNED_BY_LOGIN
+@version = EXAM_VERSION_UUID
+@writer = PER_TAB_RANDOM_UUID
+@attempt = ATTEMPT_UUID
+@question = QUESTION_UUID
+
+### Health; not proof of a full workflow
+GET {{base}}/healthz
+
+### Explicit school sign-in (cookie jar managed by the HTTP client)
+POST {{base}}/v1/auth/login
+Origin: https://APPROVED_FRONTEND_ORIGIN
+Content-Type: application/json
+
+{"schoolCode":"{{schoolCode}}","loginId":"{{loginId}}","password":"{{password}}"}
+
+### Session resume
+GET {{base}}/v1/auth/session
+
+### Student start/resume, with a stable per-tab writer UUID
+POST {{base}}/v1/attempts/start
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"versionId":"{{version}}","writer":"{{writer}}"}
+
+### Versioned acknowledged save; response uses stable option ID, not displayed letter
+POST {{base}}/v1/attempts/answers
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"attemptId":"{{attempt}}","questionId":"{{question}}","writer":"{{writer}}","revision":1,"response":null}
+
+### Idempotent finalization
+POST {{base}}/v1/attempts/submit
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"attemptId":"{{attempt}}","writer":"{{writer}}"}
+
+### Teacher review (hundredths of a mark)
+POST {{base}}/v1/grades/review
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"attemptId":"{{attempt}}","questionId":"{{question}}","score":300,"revision":1,"feedback":"Reviewed feedback","reason":"Teacher review"}
+
+### Teacher publication requires all questions reviewed
+POST {{base}}/v1/results/publish
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"attemptId":"{{attempt}}","reason":"Teacher publication"}
+
+### Published-only student progress
+POST {{base}}/v1/reports/student
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{}
+
+### Class-scoped school report (administrator/assigned teacher)
+POST {{base}}/v1/reports/school
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"academicYear":"2026","limit":25,"offset":0}
+
+### Owner-only school creation
+POST {{base}}/v1/schools
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"code":"fictional-school","name":"Fictional School","timezone":"Asia/Kolkata","plan":"Pilot","startsAt":"2026-11-07T00:00:00Z","endsAt":"2027-11-07T00:00:00Z","teacherLimit":10,"studentLimit":100,"aiLimit":100}
+
+### Sign out clears the application session
+POST {{base}}/v1/auth/logout
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{}
+
+# Complete operation request schemas are in openapi.json. This sample collection
+# does not yet exercise every group/import/query/profile/owner workflow end-to-end.
