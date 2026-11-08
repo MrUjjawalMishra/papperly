@@ -1,0 +1,38 @@
+name: Restricted staging owner activation
+on:
+  push:
+    branches: [ops/staging-owner-bootstrap]
+permissions:
+  contents: read
+concurrency:
+  group: papperly-staging-release
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run verify
+      - run: node scripts/scan-secrets.mjs
+      - run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 detect --source=/repo --config=/repo/.gitleaks.toml --no-git --redact --exit-code=1
+  activate:
+    needs: validate
+    environment: Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Activate the fixed staging owner without logging credentials
+        run: node scripts/staging-owner-bootstrap.mjs
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          OWNER_BOOTSTRAP_PASSWORD: ${{ secrets.OWNER_BOOTSTRAP_PASSWORD }}
