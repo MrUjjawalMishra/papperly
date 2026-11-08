@@ -1449,6 +1449,105 @@
         }
       }
     },
+    "/v1/schools/terms": {
+      "post": {
+        "operationId": "manage_term",
+        "tags": ["schools"],
+        "description": "Authorization is enforced by checked PostgreSQL RPC and RLS. See docs/api.md and backend-requirements.md for role/scope and idempotency rules.",
+        "security": [
+          {
+            "sessionCookie": [],
+            "csrf": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "exclusiveMinimum": true,
+                    "minimum": 0
+                  },
+                  "academicYear": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "startsAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endsAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  }
+                },
+                "required": [
+                  "academicYear",
+                  "name",
+                  "startsAt",
+                  "endsAt",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation. Database UTC timestamps are ISO 8601; marks are integer hundredths.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {}
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/v1/reports/statistics": {
       "post": {
         "operationId": "learning_statistics",
@@ -1471,10 +1570,28 @@
                     "type": "string",
                     "format": "uuid"
                   },
+                  "academicYear": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "classId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "section": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
                   "subject": {
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
+                  },
+                  "termId": {
+                    "type": "string",
+                    "format": "uuid"
                   },
                   "from": {
                     "type": "string",
@@ -1548,10 +1665,33 @@
                     "type": "string",
                     "format": "uuid"
                   },
+                  "academicYear": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "classId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "section": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": ["csv", "printable"],
+                    "default": "csv"
+                  },
                   "subject": {
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
+                  },
+                  "termId": {
+                    "type": "string",
+                    "format": "uuid"
                   },
                   "from": {
                     "type": "string",
@@ -2093,7 +2233,16 @@
                     "minLength": 1,
                     "maxLength": 200
                   },
+                  "termId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
                   "academicYear": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "section": {
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
@@ -4910,10 +5059,38 @@
                     "type": "string",
                     "format": "uuid"
                   },
+                  "academicYear": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "classId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "section": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
                   "subject": {
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
+                  },
+                  "termId": {
+                    "type": "string",
+                    "format": "uuid"
                   },
                   "from": {
                     "type": "string",
@@ -5044,6 +5221,84 @@
             "$ref": "#/components/responses/Error"
           },
           "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/terms": {
+      "get": {
+        "operationId": "list_school_terms",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000,
+              "default": 0
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Only authorized rows. Explicit projection: id,academic_year,name,starts_at,ends_at,revision",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {},
+                          "academic_year": {},
+                          "name": {},
+                          "starts_at": {},
+                          "ends_at": {},
+                          "revision": {}
+                        },
+                        "additionalProperties": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
             "$ref": "#/components/responses/Error"
           }
         }

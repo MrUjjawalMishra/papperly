@@ -132,8 +132,8 @@ it("creates only the authorized names and is retry-safe after a partial bucket c
       };
     return bucket ? { result: { name: target.bucket } } : null;
   };
-  await provisionPrivateResources(api, target);
-  await provisionPrivateResources(api, target);
+  await provisionPrivateResources(api, { ...target, zeroSpendOnly: false });
+  await provisionPrivateResources(api, { ...target, zeroSpendOnly: false });
   expect(writes).toEqual([
     {
       path: "/r2/buckets",
@@ -178,4 +178,18 @@ it("never follows redirects or exposes token/provider message contents on a deni
   } catch (error) {
     expect(error.message).not.toContain(secret);
   }
+});
+it("honors the zero-spend policy without creating missing resources", async () => {
+  const calls = [];
+  await expect(
+    provisionPrivateResources(
+      async (path, method = "GET") => {
+        calls.push(method);
+        if (path.includes("/r2/buckets/")) return null;
+        throw Error("unexpected");
+      },
+      { ...target, zeroSpendOnly: true },
+    ),
+  ).rejects.toThrow("Zero-spend");
+  expect(calls).toEqual(["GET"]);
 });

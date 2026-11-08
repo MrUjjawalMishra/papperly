@@ -7,7 +7,10 @@ import {
   type Question,
   type Key,
 } from "../../../packages/contracts/src/index";
-import { safeCsv } from "../../../packages/domain/src/index";
+import {
+  renderReport,
+  type ExportReport,
+} from "../../../packages/domain/src/report-export";
 import {
   validateKey,
   validateSuggestion,
@@ -270,47 +273,25 @@ async function scan(env: Env, job: Job) {
 }
 
 async function exportReport(env: Env, job: Job) {
-  const report = await rpc<{
-    exportId: string;
-    schoolId: string;
-    filters: unknown;
-    data: {
-      results: {
-        id: string;
-        subject: string;
-        total: number;
-        maximum: number;
-        publishedAt: string;
-      }[];
-    };
-  } | null>(env, "runtime_export_data", { id: job.payload.exportId });
-  if (!report) throw new ApiError(403, "EXPORT_UNAVAILABLE");
-  const rows = [
-    ["Papperly published-result report"],
-    ["School", report.schoolId],
-    ["Generated at", new Date().toISOString()],
-    ["Filters", JSON.stringify(report.filters)],
-    [
-      "Result",
-      "Subject",
-      "Earned (hundredths)",
-      "Maximum (hundredths)",
-      "Published at",
-    ],
-    ...report.data.results.map((r) => [
-      r.id,
-      r.subject,
-      r.total,
-      r.maximum,
-      r.publishedAt,
-    ]),
-  ];
-  const csv = rows.map((r) => r.map(safeCsv).join(",")).join("\r\n");
-  const objectKey = `${report.schoolId}/exports/${report.exportId}.csv`;
-  await env.FILES.put(objectKey, csv, {
-    httpMetadata: { contentType: "text/csv" },
+  const report = await rpc<ExportReport | null>(env, "runtime_export_data", {
+    id: job.payload.exportId,
   });
-  await rpc(env, "runtime_export_finish", { id: report.exportId, objectKey });
+  if (!report) throw new ApiError(403, "EXPORT_UNAVAILABLE");
+  const file = renderReport(report);
+  const objectKey = `${report.schoolId}/exports/${report.exportId}.${file.extension}`;
+  await env.FILES.put(objectKey, file.content, {
+    httpMetadata: { contentType: file.contentType },
+  });
+  try {
+    await rpc(env, "runtime_export_finish", {
+      id: report.exportId,
+      objectKey,
+      sourceFingerprint: report.sourceFingerprint,
+    });
+  } catch (error) {
+    await env.FILES.delete(objectKey);
+    throw error;
+  }
   await rpc(env, "runtime_finish", {
     id: job.id,
     runToken: job.runToken,

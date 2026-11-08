@@ -140,6 +140,8 @@ export async function provisionPrivateResources(api, target) {
   );
   let bucketCreated = false;
   if (!bucket) {
+    if (target.zeroSpendOnly)
+      throw Error("Zero-spend policy forbids automatic resource creation");
     await api("/r2/buckets", "POST", {
       name: target.bucket,
       storageClass: "Standard",
@@ -183,6 +185,8 @@ export async function provisionPrivateResources(api, target) {
     if (page === 1000) throw Error("Queue pagination exceeded safety limit");
   }
   const queueCreated = !queue;
+  if (!queue && target.zeroSpendOnly)
+    throw Error("Zero-spend policy forbids automatic resource creation");
   if (!queue)
     queue = (await api("/queues", "POST", { queue_name: target.queue })).result;
   if (queue?.queue_name !== target.queue || typeof queue.queue_id !== "string")
@@ -290,6 +294,11 @@ async function main() {
     report.billing = {
       planReadAvailable: Boolean(subscription),
       upgradePerformed: false,
+      zeroSpendOnly: target.zeroSpendOnly === true,
+      spendingCapUsd: target.zeroSpendOnly ? 0 : null,
+      accountBillingVerification: subscription
+        ? "read"
+        : "unavailable; no claim of a verified account billing cap",
     };
     const previous = await api(
       `/workers/scripts/${target.worker}/settings`,
@@ -297,6 +306,8 @@ async function main() {
       undefined,
       true,
     );
+    if (!previous && target.zeroSpendOnly)
+      throw Error("Zero-spend policy requires an existing staging Worker");
     if (previous) {
       const bindings = previous.result?.bindings;
       if (

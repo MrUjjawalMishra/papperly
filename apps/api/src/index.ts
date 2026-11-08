@@ -367,7 +367,7 @@ export async function handle(request: Request, env: Env): Promise<Response> {
     }
     if (route.startsWith("exports/") && request.method === "GET") {
       const id = uuid.parse(route.slice(8));
-      const f = await rpc<{ objectKey: string }>(
+      const f = await rpc<{ objectKey: string; format?: string }>(
         env,
         "export_download",
         { id },
@@ -375,10 +375,17 @@ export async function handle(request: Request, env: Env): Promise<Response> {
       );
       const file = await env.FILES.get(f.objectKey);
       if (!file) throw new ApiError(404, "EXPORT_UNAVAILABLE");
-      headers.set("Content-Type", "text/csv; charset=utf-8");
+      headers.set(
+        "Content-Type",
+        f.format === "printable"
+          ? "text/plain; charset=utf-8"
+          : "text/csv; charset=utf-8",
+      );
       headers.set(
         "Content-Disposition",
-        "attachment; filename=papperly-report.csv",
+        f.format === "printable"
+          ? "attachment; filename=papperly-report.txt"
+          : "attachment; filename=papperly-report.csv",
       );
       return new Response(file.body, { headers });
     }

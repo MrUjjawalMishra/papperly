@@ -171,6 +171,20 @@
       "sha256": "9e15637cce0a10713159e5c0aeb7d5682dee5d638d6a07f980b5d6bb4eea8b57",
       "providerVersion": "20261108060326",
       "canonicalFile": "20261108060326_papperly_identity_session_guards.sql"
+    },
+    {
+      "file": "20261108093445_longitudinal_reporting.sql",
+      "name": "papperly_longitudinal_reporting",
+      "sha256": "6f234a87f6c97fcc8560290248a1d5b99310d5248c3fd0b9f2d095eddbd9e83a",
+      "providerVersion": "20261108094447",
+      "canonicalFile": "20261108094447_papperly_longitudinal_reporting.sql"
+    },
+    {
+      "file": "20261108094119_report_terms_and_metrics.sql",
+      "name": "papperly_report_terms_and_metrics",
+      "sha256": "852c87ff5c259ea8d50a70d002c2180ef135e033af5c94d20882c69bb9a30b3c",
+      "providerVersion": "20261108094456",
+      "canonicalFile": "20261108094456_papperly_report_terms_and_metrics.sql"
     }
   ]
 }

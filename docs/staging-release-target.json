@@ -7,9 +7,10 @@
   "workersSubdomain": "mr-ujjawalmishra",
   "supabaseUrl": "https://soudjtewvquywncqtwyo.supabase.co",
   "supabasePublishableKey": "sb_publishable_v_L5PLJvoKtiWhE0WenLMw_VBUZw39I",
-  "migrationDigest": "6ea814a8ffa64dba82da217485d844dd521afb5c9993db59854a09d94fd24ad2",
-  "migrationVersion": "20261108060326",
+  "migrationDigest": "c1bd80164380cdbff6f2feb9cdcf72ebc662fa36d7cc133374b33c8fb560ef62",
+  "migrationVersion": "20261108094456",
   "migrationVerifiedAt": "2026-11-08",
-  "authorization": "User approved staging Worker, private R2 and Queue creation and required paid-plan upgrades on 2026-11-08; no production changes.",
-  "authAliasDomain": "identities.staging.papperly.invalid"
+  "authorization": "Staging authorized; latest user decision: $0/month cap, no paid services and no automatic upgrades. Existing resources only until free-tier availability is verified.",
+  "authAliasDomain": "identities.staging.papperly.invalid",
+  "zeroSpendOnly": true
 }

@@ -1607,6 +1607,7 @@ export type Database = {
           id: string;
           object_key: string | null;
           school_id: string;
+          source_fingerprint: string | null;
           source_version: number;
           status: string;
         };
@@ -1618,6 +1619,7 @@ export type Database = {
           id?: string;
           object_key?: string | null;
           school_id: string;
+          source_fingerprint?: string | null;
           source_version: number;
           status?: string;
         };
@@ -1629,6 +1631,7 @@ export type Database = {
           id?: string;
           object_key?: string | null;
           school_id?: string;
+          source_fingerprint?: string | null;
           source_version?: number;
           status?: string;
         };
@@ -1693,6 +1696,44 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "memberships";
             referencedColumns: ["school_id", "id"];
+          },
+        ];
+      };
+      school_terms: {
+        Row: {
+          academic_year: string;
+          ends_at: string;
+          id: string;
+          name: string;
+          revision: number;
+          school_id: string;
+          starts_at: string;
+        };
+        Insert: {
+          academic_year: string;
+          ends_at: string;
+          id?: string;
+          name: string;
+          revision?: number;
+          school_id: string;
+          starts_at: string;
+        };
+        Update: {
+          academic_year?: string;
+          ends_at?: string;
+          id?: string;
+          name?: string;
+          revision?: number;
+          school_id?: string;
+          starts_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "school_terms_school_id_fkey";
+            columns: ["school_id"];
+            isOneToOne: false;
+            referencedRelation: "schools";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -2096,6 +2137,7 @@ export type Database = {
       learning_statistics: { Args: { p: Json }; Returns: Json };
       manage_coteacher: { Args: { p: Json }; Returns: undefined };
       manage_profile: { Args: { p: Json }; Returns: string };
+      manage_term: { Args: { p: Json }; Returns: string };
       mark_notification: { Args: { p: Json }; Returns: undefined };
       moderate_article: { Args: { p: Json }; Returns: undefined };
       owner_usage: { Args: { p: Json }; Returns: Json };

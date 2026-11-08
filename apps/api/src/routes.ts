@@ -178,12 +178,30 @@ export const operations = {
       })
       .strict(),
   },
+  "schools/terms": {
+    rpc: "manage_term",
+    schema: z
+      .object({
+        id: uuid.optional(),
+        revision: z.number().int().positive().optional(),
+        academicYear: short,
+        name: short,
+        startsAt: z.string().datetime(),
+        endsAt: z.string().datetime(),
+        reason: short,
+      })
+      .strict(),
+  },
   "reports/statistics": {
     rpc: "learning_statistics",
     schema: z
       .object({
         studentId: uuid.optional(),
+        academicYear: short.optional(),
+        classId: uuid.optional(),
+        section: short.optional(),
         subject: short.optional(),
+        termId: uuid.optional(),
         from: z.string().datetime().optional(),
         to: z.string().datetime().optional(),
       })
@@ -194,7 +212,12 @@ export const operations = {
     schema: z
       .object({
         studentId: uuid,
+        academicYear: short.optional(),
+        classId: uuid.optional(),
+        section: short.optional(),
+        format: z.enum(["csv", "printable"]).default("csv"),
         subject: short.optional(),
+        termId: uuid.optional(),
         from: z.string().datetime().optional(),
         to: z.string().datetime().optional(),
       })
@@ -237,7 +260,9 @@ export const operations = {
       .object({
         classId: uuid.optional(),
         subject: short.optional(),
+        termId: uuid.optional(),
         academicYear: short.optional(),
+        section: short.optional(),
         from: z.string().datetime().optional(),
         to: z.string().datetime().optional(),
         limit: z.number().int().min(1).max(100).optional(),
@@ -452,7 +477,13 @@ export const operations = {
     schema: z
       .object({
         studentId: uuid.optional(),
+        academicYear: short.optional(),
+        classId: uuid.optional(),
+        section: short.optional(),
+        limit: z.number().int().min(1).max(100).optional(),
+        offset: z.number().int().min(0).max(10000).optional(),
         subject: short.optional(),
+        termId: uuid.optional(),
         from: z.string().datetime().optional(),
         to: z.string().datetime().optional(),
       })
@@ -472,6 +503,10 @@ export const operations = {
   },
 } as const;
 export const readTables = {
+  terms: {
+    table: "school_terms",
+    select: "id,academic_year,name,starts_at,ends_at,revision",
+  },
   exams: {
     table: "exam_versions",
     select:
