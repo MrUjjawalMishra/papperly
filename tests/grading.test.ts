@@ -34,7 +34,7 @@ it("publishes only complete reviewed marks, preserves teacher overrides, and inv
       revision: 1,
       reason: "Review",
     });
-  const r = await call<string>(db, ids.teacher, "publish_result", {
+  await call<string>(db, ids.teacher, "publish_result", {
     attemptId: a.id,
     reason: "Publish",
   });
@@ -107,8 +107,8 @@ it("publishes only complete reviewed marks, preserves teacher overrides, and inv
   ).toMatchObject({ source_version: old + 1, status: "updating" });
   const insight = (
     await db.query<{ id: string }>(
-      "select id from outbox where kind='insight'and payload->>'resultId'=$1 order by created_at limit 1",
-      [r],
+      "select id from outbox where kind='insight'and payload->>'studentId'=$1 order by (payload->>'sourceVersion')::bigint desc limit 1",
+      [ids.student],
     )
   ).rows[0];
   const ic = (

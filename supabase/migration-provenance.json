@@ -206,6 +206,20 @@
       "sha256": "04cd8833c67d59d2c6f437676a1d51520c09c2c9b3ab0e0f63319c9676631da1",
       "providerVersion": "20261108155141",
       "canonicalFile": "20261108155141_papperly_authoritative_deadline_clock.sql"
+    },
+    {
+      "file": "20261108155756_insight_evidence_lifecycle.sql",
+      "name": "papperly_insight_evidence_lifecycle",
+      "sha256": "2c6cb67e17e494291f86d051a2927dc43e41b0f987294cc66e8fd34cb9f5ab57",
+      "providerVersion": "20261108224728",
+      "canonicalFile": "20261108224728_papperly_insight_evidence_lifecycle.sql"
+    },
+    {
+      "file": "20261108224017_upload_idempotency.sql",
+      "name": "papperly_upload_idempotency",
+      "sha256": "25970c84eb82de31f1c2464dea47d80130f1dc01bbb5f0b430be84cf6420b991",
+      "providerVersion": "20261108224740",
+      "canonicalFile": "20261108224740_papperly_upload_idempotency.sql"
     }
   ]
 }

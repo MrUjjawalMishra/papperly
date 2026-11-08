@@ -2,11 +2,11 @@ import { z } from "zod";
 import { geminiConfigured, geminiJson, GEMINI_MODEL } from "./gemini";
 import { validateFormattedPaper } from "../../../packages/domain/src/formatting";
 import { reconcileProvisioning } from "./accounts";
+import { type Question, type Key } from "../../../packages/contracts/src/index";
 import {
-  guidance,
-  type Question,
-  type Key,
-} from "../../../packages/contracts/src/index";
+  validateGuidance,
+  type GuidanceEvidence,
+} from "../../../packages/domain/src/guidance";
 import {
   renderReport,
   type ExportReport,
@@ -20,13 +20,12 @@ interface Job {
   schoolId: string;
   attempts: number;
   payload: Record<string, unknown>;
-  data: {
+  data: GuidanceEvidence & {
     rawText?: string;
     question: Question;
     key: Key;
     response: unknown;
     sourceVersion?: number;
-    results?: { id: string }[];
     correction?: string;
     suppressed?: boolean;
   };
@@ -57,27 +56,13 @@ async function generate(env: Env, job: Job) {
       model: GEMINI_MODEL,
       promptVersion: "papperly-1",
     };
-  const parsed = guidance.parse(data);
-  const ids = new Set(job.data.results?.map((r) => r.id));
-  if (
-    parsed.resultIds.some((id) => !ids.has(id)) ||
-    parsed.strengths.some((s) => s.evidence.some((id) => !ids.has(id))) ||
-    parsed.practice.some(
-      (s) => s.evidence.some((id) => !ids.has(id)) || s.resourceId !== null,
-    )
-  )
-    throw new ApiError(503, "AI_UNAUTHORIZED_EVIDENCE");
-  // Numeric prose is rejected until an evidence-to-number validator is available.
-  if (
-    /\d/.test(
-      JSON.stringify({
-        strengths: parsed.strengths.map((s) => s.text),
-        practice: parsed.practice.map((s) => s.action),
-      }),
-    )
-  )
-    throw new ApiError(503, "AI_UNVALIDATED_NUMBER");
-  return parsed;
+  try {
+    return validateGuidance(job.data, data);
+  } catch (error) {
+    if (error instanceof Error && /^AI_[A-Z_]+$/.test(error.message))
+      throw new ApiError(503, error.message);
+    throw new ApiError(503, "INVALID_PROVIDER_OUTPUT");
+  }
 }
 export async function consume(
   batch: MessageBatch<{ id: string; kind: string }>,
@@ -124,6 +109,17 @@ export async function consume(
         message.ack();
         continue;
       }
+      if (job.kind === "insight" && !job.data.results?.length) {
+        await rpc(env, "runtime_finish", {
+          id: job.id,
+          runToken: job.runToken,
+          status: "unavailable",
+          errorCode: "INSUFFICIENT_EVIDENCE",
+          sourceVersion: job.data.sourceVersion,
+        });
+        message.ack();
+        continue;
+      }
       const result = await generate(env, job);
       if (job.kind === "format")
         await rpc(env, "runtime_formatted", {
@@ -137,6 +133,9 @@ export async function consume(
         status: "done",
         result,
         sourceVersion: job.data.sourceVersion,
+        evidenceFingerprint: job.data.fingerprint,
+        model: job.kind === "insight" ? GEMINI_MODEL : undefined,
+        promptVersion: job.kind === "insight" ? "papperly-1" : undefined,
       });
       message.ack();
     } catch (e) {

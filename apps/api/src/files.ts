@@ -39,7 +39,18 @@ export async function upload(request: Request, env: Env, s: Session) {
     new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
     (v) => v.toString(16).padStart(2, "0"),
   ).join("");
-  const a = await rpc<{ id: string; objectKey: string }>(
+  const idempotencyKey = request.headers.get("Idempotency-Key");
+  if (
+    idempotencyKey !== null &&
+    !/^[A-Za-z0-9._:-]{8,128}$/.test(idempotencyKey)
+  )
+    throw new ApiError(400, "INVALID_IDEMPOTENCY_KEY");
+  const a = await rpc<{
+    id: string;
+    objectKey: string;
+    state: string;
+    requiresUpload: boolean;
+  }>(
     env,
     "reserve_upload",
     {
@@ -49,9 +60,11 @@ export async function upload(request: Request, env: Env, s: Session) {
       type: validated.detectedType,
       size,
       checksum,
+      ...(idempotencyKey === null ? {} : { idempotencyKey }),
     },
     s.accessToken,
   );
+  if (!a.requiresUpload) return { id: a.id, state: a.state };
   await env.FILES.put(a.objectKey, bytes, {
     httpMetadata: { contentType: type },
     customMetadata: { checksum, attachmentId: a.id },

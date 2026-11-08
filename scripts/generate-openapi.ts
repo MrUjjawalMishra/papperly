@@ -293,6 +293,14 @@ preview.post.requestBody = {
 const upload = paths["/v1/files/upload"] as { post: Record<string, unknown> };
 upload.post.parameters = [
   {
+    name: "Idempotency-Key",
+    in: "header",
+    required: false,
+    description:
+      "Retry with identical parent, file bytes and metadata. Conflicting payload returns 409; absent key derives an uploader/content reservation. Deleted reservations require a new key.",
+    schema: { type: "string", pattern: "^[A-Za-z0-9._:-]{8,128}$" },
+  },
+  {
     name: "X-Filename",
     in: "header",
     required: true,
