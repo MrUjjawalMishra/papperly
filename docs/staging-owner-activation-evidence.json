@@ -1,0 +1,26 @@
+{
+  "workflowRun": 42467255957,
+  "jobId": 128689707256,
+  "commit": "bd0bde92c7b0e1aa3a7b711d41cdc831c674c627",
+  "result": {
+    "id": "3807692f-7a42-4231-ab1b-05a64fd20621",
+    "state": "active",
+    "credentialsIssued": true,
+    "loginVerified": true,
+    "mustChangePassword": true,
+    "diagnosticSessionLoggedOut": true,
+    "environment": "staging",
+    "commit": "bd0bde92c7b0e1aa3a7b711d41cdc831c674c627"
+  },
+  "workflowUrl": "https://github.com/MrUjjawalMishra/papperly/actions/runs/42467255957",
+  "conclusion": "success",
+  "independentDatabaseVerification": {
+    "activeOwners": 1,
+    "ownerAuthIdentityLinked": true,
+    "mustChangePassword": true,
+    "activeApplicationSessions": 0,
+    "attributedBootstrapAudit": true
+  },
+  "applicationReleaseUnchanged": "af443c72454c4fd033a136d5054f068306c451fd",
+  "secretRemoval": "User should remove OWNER_BOOTSTRAP_PASSWORD from GitHub environment after verification; connector cannot manage environment secrets."
+}
