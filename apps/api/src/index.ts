@@ -415,6 +415,14 @@ export async function handle(request: Request, env: Env): Promise<Response> {
           : new ApiError(500, "INTERNAL_ERROR");
     if (error.status === 429 && error.retryAfterSeconds)
       headers.set("Retry-After", String(error.retryAfterSeconds));
+    if (
+      error.status === 401 &&
+      ["SESSION_EXPIRED", "SESSION_REVOKED"].includes(error.code)
+    )
+      headers.append(
+        "Set-Cookie",
+        "__Host-papperly=; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=0",
+      );
     return json(
       {
         error: {

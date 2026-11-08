@@ -4,9 +4,10 @@ import { ids } from "../tests/database";
 const q = (v: unknown) => "'" + String(v).replaceAll("'", "''") + "'";
 let sql =
   "-- SYNTHETIC DEVELOPMENT ONLY. No Auth credentials are created. Never run against real school data.\n";
-sql += `insert into schools(id,code,name)values('${ids.school}','oak','Oak Demonstration School'),('${ids.otherSchool}','pine','Pine Demonstration School');\n`;
 sql +=
-  "insert into subscriptions(school_id,plan,starts_at,ends_at,teacher_limit,student_limit,ai_limit)select id,'Synthetic',now()-interval '1 day',now()+interval '1 year',10,100,100 from schools;\n";
+  "-- Privileged fixture initialization only; ordinary-role RLS tests set their own full JWT claims afterward.\nselect set_config('request.jwt.claims','{\"role\":\"service_role\"}',false);\n";
+sql += `insert into schools(id,code,name)values('${ids.school}','oak','Oak Demonstration School'),('${ids.otherSchool}','pine','Pine Demonstration School');\n`;
+sql += `insert into subscriptions(school_id,plan,starts_at,ends_at,teacher_limit,student_limit,ai_limit)select id,'Synthetic',now()-interval '1 day',now()+interval '1 year',10,100,100 from schools where id in('${ids.school}','${ids.otherSchool}');\n`;
 sql += `insert into memberships(id,role,display_name)values('${ids.owner}','owner','Synthetic Platform Owner');\n`;
 const students: string[][] = [];
 for (let school = 0; school < 2; school++) {

@@ -9,6 +9,8 @@ it("replays the native staging RLS harness and rolls back every fixture", async 
         readFileSync("supabase/seed.sql", "utf8") +
         "\n" +
         readFileSync("tests/live/rls-checks.sql", "utf8") +
+        "\n" +
+        readFileSync("tests/live/identity-checks.sql", "utf8") +
         "\nrollback;",
     );
     expect(
@@ -18,6 +20,12 @@ it("replays the native staging RLS harness and rolls back every fixture", async 
             "select count(*)as n from public.schools",
           )
         ).rows[0].n,
+      ),
+    ).toBe(0);
+    expect(
+      Number(
+        (await db.query<{ n: number }>("select count(*)as n from auth.users"))
+          .rows[0].n,
       ),
     ).toBe(0);
   } finally {

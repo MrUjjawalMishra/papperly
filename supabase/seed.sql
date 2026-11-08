@@ -1,6 +1,8 @@
 -- SYNTHETIC DEVELOPMENT ONLY. No Auth credentials are created. Never run against real school data.
+-- Privileged fixture initialization only; ordinary-role RLS tests set their own full JWT claims afterward.
+select set_config('request.jwt.claims','{"role":"service_role"}',false);
 insert into schools(id,code,name)values('10000000-0000-4000-8000-000000000001','oak','Oak Demonstration School'),('10000000-0000-4000-8000-000000000002','pine','Pine Demonstration School');
-insert into subscriptions(school_id,plan,starts_at,ends_at,teacher_limit,student_limit,ai_limit)select id,'Synthetic',now()-interval '1 day',now()+interval '1 year',10,100,100 from schools;
+insert into subscriptions(school_id,plan,starts_at,ends_at,teacher_limit,student_limit,ai_limit)select id,'Synthetic',now()-interval '1 day',now()+interval '1 year',10,100,100 from schools where id in('10000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000002');
 insert into memberships(id,role,display_name)values('20000000-0000-4000-8000-000000000000','owner','Synthetic Platform Owner');
 insert into memberships(id,school_id,role,display_name,credential_policy)values('20000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','administrator','Synthetic Administrator','case-sensitive-v1');
 insert into memberships(id,school_id,role,display_name,credential_policy)values('20000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000001','teacher','Synthetic Teacher 1','case-sensitive-v1');

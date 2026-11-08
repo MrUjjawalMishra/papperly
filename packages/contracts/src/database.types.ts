@@ -1,4 +1,3 @@
-// Generated from verified Supabase staging. Database types are not student/public API projections.
 export type Json =
   | string
   | number
@@ -941,6 +940,7 @@ export type Database = {
       memberships: {
         Row: {
           active: boolean;
+          auth_revoked_before: string | null;
           created_at: string;
           credential_policy: string;
           credential_version: number;
@@ -952,6 +952,7 @@ export type Database = {
         };
         Insert: {
           active?: boolean;
+          auth_revoked_before?: string | null;
           created_at?: string;
           credential_policy?: string;
           credential_version?: number;
@@ -963,6 +964,7 @@ export type Database = {
         };
         Update: {
           active?: boolean;
+          auth_revoked_before?: string | null;
           created_at?: string;
           credential_policy?: string;
           credential_version?: number;

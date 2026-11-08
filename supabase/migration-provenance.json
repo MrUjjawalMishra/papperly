@@ -164,6 +164,13 @@
       "sha256": "2cb985ae1006c86f092e3a5268f000424ebb6ee8bb19f5e46d89f49e947d9c19",
       "providerVersion": "20261108050823",
       "canonicalFile": "20261108050823_papperly_owner_lookup.sql"
+    },
+    {
+      "file": "20261108054711_inactive_identity_denial.sql",
+      "name": "papperly_identity_session_guards",
+      "sha256": "9e15637cce0a10713159e5c0aeb7d5682dee5d638d6a07f980b5d6bb4eea8b57",
+      "providerVersion": "20261108060326",
+      "canonicalFile": "20261108060326_papperly_identity_session_guards.sql"
     }
   ]
 }

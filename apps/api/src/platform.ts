@@ -70,6 +70,7 @@ export async function supabase(
       typeof data === "object" && data !== null && "message" in data
         ? String(data.message)
         : "DATABASE_UNAVAILABLE";
+    if (code === "SESSION_REVOKED") throw new ApiError(401, "SESSION_REVOKED");
     throw new ApiError(
       response.status === 403 || code === "FORBIDDEN"
         ? 403

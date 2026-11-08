@@ -14,10 +14,16 @@ export const ids = {
 export async function database(withFixtures = true) {
   const db = new PGlite();
   await db.exec(
-    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create function auth.uid()returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated,anon,service_role;grant execute on function auth.uid()to authenticated,anon,service_role;`,
+    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;
+create table auth.users(id uuid primary key,aud text,role text,email text,created_at timestamptz,updated_at timestamptz,raw_app_meta_data jsonb,raw_user_meta_data jsonb);
+create table auth.sessions(id uuid primary key,user_id uuid,created_at timestamptz,updated_at timestamptz,not_after timestamptz);
+create function auth.jwt()returns jsonb language sql stable as $$select coalesce(nullif(current_setting('request.jwt.claims',true),'')::jsonb,'{}')$$;
+create function auth.uid()returns uuid language sql stable as $$select coalesce(nullif(current_setting('request.jwt.claim.sub',true),''),auth.jwt()->>'sub')::uuid$$;
+grant usage on schema auth to authenticated,anon,service_role;grant execute on function auth.uid(),auth.jwt()to authenticated,anon,service_role;`,
   );
   for (const f of readdirSync("supabase/migrations").sort())
     await db.exec(readFileSync("supabase/migrations/" + f, "utf8"));
+  await claims(db);
   if (!withFixtures) return db;
   await db.exec(`
 insert into schools(id,code,name)values('${ids.school}','oak','Oak School'),('${ids.otherSchool}','pine','Pine School');
@@ -27,21 +33,41 @@ insert into classes(id,school_id,academic_year,name,section)values('${ids.class}
 insert into teacher_assignments values('${ids.school}','${ids.teacher}','${ids.class}','Computing');
 insert into student_registry(student_id,school_id)select id,school_id from memberships where role='student';
 insert into enrollments values('${ids.school}','${ids.class}','${ids.student}','01',true),('${ids.school}','${ids.class}','${ids.peer}','02',true);
+insert into auth.sessions(id,user_id,created_at) select id,id,now()-interval '1 hour' from memberships;
 `);
   return db;
+}
+export async function claims(
+  db: PGlite,
+  user?: string,
+  providerSessionId = user,
+) {
+  await db.query(
+    "select set_config('request.jwt.claim.sub',$1,false),set_config('request.jwt.claims',$2,false)",
+    [
+      user ?? "",
+      JSON.stringify(
+        user
+          ? { role: "authenticated", sub: user, session_id: providerSessionId }
+          : { role: "service_role" },
+      ),
+    ],
+  );
 }
 export async function asUser(
   db: PGlite,
   user: string,
   sql: string,
   params: unknown[] = [],
+  providerSessionId = user,
 ) {
   await db.exec("set role authenticated");
-  await db.query("select set_config('request.jwt.claim.sub',$1,false)", [user]);
+  await claims(db, user, providerSessionId);
   try {
     return await db.query(sql, params);
   } finally {
     await db.exec("reset role");
+    await claims(db);
   }
 }
 export async function call<T = unknown>(

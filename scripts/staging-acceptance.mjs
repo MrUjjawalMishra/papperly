@@ -8,6 +8,10 @@ import { TextEncoder } from "node:util";
 import { URLSearchParams } from "node:url";
 import { adminClient, bootstrapOwner } from "./bootstrap-owner.mjs";
 import { rosterTemplate } from "../packages/domain/src/imports.ts";
+import {
+  canonicalPassword,
+  STUDENT_POLICY,
+} from "../packages/domain/src/credentials.ts";
 import { unzipSync, zipSync, strToU8, strFromU8 } from "fflate";
 
 const target = JSON.parse(
@@ -74,6 +78,8 @@ class Client {
   userId = "";
   loginId = "";
   schoolCode = "";
+  role = "";
+  dbJwt = "";
   async request(path, body, expected = 200, options = {}) {
     const headers = {
       Origin: base,
@@ -134,7 +140,10 @@ class Client {
         ),
       );
     }
-    if (expected === 200) this.userId = r.data.user.id;
+    if (expected === 200) {
+      this.userId = r.data.user.id;
+      this.role = r.data.user.role;
+    }
     return r;
   }
   async changePassword() {
@@ -158,6 +167,64 @@ class Client {
     await stale.request("/v1/auth/session", undefined, 401);
     await this.request("/v1/auth/session");
   }
+}
+async function ordinaryDataApi(client, path, body, expected = [200]) {
+  const response = await fetch(target.supabaseUrl + "/rest/v1/" + path, {
+    method: body === undefined ? "GET" : "POST",
+    headers: {
+      apikey: target.supabasePublishableKey,
+      Authorization: `Bearer ${client.dbJwt}`,
+      "Content-Type": "application/json",
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+    signal: AbortSignal.timeout(20000),
+    redirect: "error",
+  });
+  ensure(
+    expected.includes(response.status),
+    `Ordinary Data API ${path.split("?")[0]} returned unexpected status ${response.status}`,
+  );
+  return {
+    status: response.status,
+    data: await response.json().catch(() => null),
+  };
+}
+async function ordinaryToken(client) {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const response = await fetch(
+      target.supabaseUrl + "/auth/v1/token?grant_type=password",
+      {
+        method: "POST",
+        headers: {
+          apikey: target.supabasePublishableKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: `${client.userId}@${target.authAliasDomain}`,
+          password: canonicalPassword(
+            client.password,
+            client.role,
+            client.role === "student" ? STUDENT_POLICY : "case-sensitive-v1",
+          ),
+        }),
+        signal: AbortSignal.timeout(20000),
+        redirect: "error",
+      },
+    );
+    if (response.status === 429 && attempt < 7) {
+      await delay(3000);
+      continue;
+    }
+    ensure(response.ok, "Ordinary-user Auth token acquisition failed");
+    const data = await response.json();
+    ensure(
+      typeof data.access_token === "string" && data.user?.id === client.userId,
+      "Ordinary-user Auth identity mismatch",
+    );
+    client.dbJwt = data.access_token;
+    return;
+  }
+  throw Error("Ordinary-user Auth setup remained rate-limited");
 }
 const clients = [];
 let ownerId = randomUUID();
@@ -880,6 +947,22 @@ try {
       await old.login(false, old.password, 401);
       await s.login();
       const prior = s.cookie;
+      await ordinaryToken(s);
+      ensure(
+        (await ordinaryDataApi(s, `memberships?id=eq.${s.userId}&select=id`))
+          .data.length === 1,
+        "Ordinary JWT cannot read own membership",
+      );
+      await ordinaryToken(b.student);
+      ensure(
+        (
+          await ordinaryDataApi(
+            b.student,
+            `memberships?id=eq.${s.userId}&select=id`,
+          )
+        ).data.length === 0,
+        "Ordinary JWT crossed school boundary",
+      );
       const reset = await a.teacher.call("auth/password", {
         userId: s.userId,
         currentPassword: a.teacher.password,
@@ -892,9 +975,21 @@ try {
       const stale = new Client();
       stale.cookie = prior;
       await stale.request("/v1/auth/session", undefined, 401);
+      await ordinaryDataApi(
+        s,
+        `memberships?id=eq.${s.userId}&select=id`,
+        undefined,
+        [401, 403],
+      );
       await s.login(false, s.password, 401);
       s.password = reset.issuedPassword;
       await s.login(false, s.password.toUpperCase());
+      await ordinaryToken(s);
+      ensure(
+        (await ordinaryDataApi(s, `memberships?id=eq.${s.userId}&select=id`))
+          .data.length === 1,
+        "Fresh ordinary JWT denied after reset",
+      );
       const events = [];
       for (let offset = 0; offset < 10000; offset += 100) {
         const page = await a.admin.call(`audit?limit=100&offset=${offset}`);
@@ -978,6 +1073,26 @@ try {
         for (const reservation of reservations)
           if (reservation.subject_id) remember(reservation.subject_id);
     }
+    const directClient = clients.find((c) => c.dbJwt);
+    let inactiveRlsDenied;
+    if (directClient) {
+      try {
+        const check = await ordinaryDataApi(
+          directClient,
+          "rpc/owner_usage",
+          { p: {} },
+          [200, 401, 403],
+        );
+        inactiveRlsDenied = check.status !== 200;
+      } catch {
+        inactiveRlsDenied = false;
+      }
+      if (!inactiveRlsDenied) {
+        report.passed = false;
+        process.exitCode = 1;
+        report.error = "Inactive ordinary JWT retained RPC access";
+      }
+    }
     for (const id of [...report.resources.users].reverse()) {
       const member = Array.isArray(found)
         ? found.find((m) => m.id === id)
@@ -1008,6 +1123,7 @@ try {
       membershipsDeactivated: true,
       schoolsSuspended: true,
       syntheticAuditAndExamEvidenceRetained: true,
+      inactiveOrdinaryJwtDenied: inactiveRlsDenied,
     };
   } catch {
     report.cleanup = { failed: true, requiresExactIdReconciliation: true };

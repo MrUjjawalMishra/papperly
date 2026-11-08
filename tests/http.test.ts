@@ -1,7 +1,7 @@
 import { beforeAll, afterAll, it, expect, vi } from "vitest";
 import type { PGlite } from "@electric-sql/pglite";
 import { handle } from "../apps/api/src/index";
-import { database, ids } from "./database";
+import { database, ids, claims } from "./database";
 import type { Env } from "../apps/api/src/platform";
 let db: PGlite;
 const env = {
@@ -19,6 +19,7 @@ const env = {
 const testPassword = "Synthetic" + crypto.randomUUID().replaceAll("-", "");
 let providerPassword = testPassword.toLowerCase();
 let simulateAuthRateLimit = false;
+const providerTokens = new Map<string, string>();
 const request = (
   path: string,
   p?: unknown,
@@ -61,8 +62,15 @@ beforeAll(async () => {
           );
         if (p.password !== providerPassword)
           return Response.json({ message: "invalid" }, { status: 400 });
+        const providerSession = crypto.randomUUID(),
+          accessToken = "synthetic-" + crypto.randomUUID();
+        providerTokens.set(accessToken, providerSession);
+        await db.query(
+          "insert into auth.sessions(id,user_id,created_at)values($1,$2,clock_timestamp())",
+          [providerSession, ids.student],
+        );
         return Response.json({
-          access_token: ids.student,
+          access_token: accessToken,
           refresh_token: "test-only",
           expires_at: Date.now() / 1000 + 3600,
         });
@@ -83,9 +91,12 @@ beforeAll(async () => {
               ? "reset role"
               : "set role authenticated",
           );
-          await db.query(
-            "select set_config('request.jwt.claim.sub',$1,false)",
-            [token === env.SUPABASE_SERVICE_ROLE_KEY ? "" : token],
+          await claims(
+            db,
+            token === env.SUPABASE_SERVICE_ROLE_KEY ? undefined : ids.student,
+            token === env.SUPABASE_SERVICE_ROLE_KEY
+              ? undefined
+              : providerTokens.get(token!),
           );
           const rows = await db.query<{ data: unknown }>(
             `select public.${name}($1::jsonb)as data`,
@@ -99,6 +110,7 @@ beforeAll(async () => {
           );
         } finally {
           await db.exec("reset role");
+          await claims(db);
         }
       }
       throw Error("Unexpected mock request " + url.pathname);
