@@ -26,7 +26,7 @@ import {
   trustedClientAddress,
   authFailure,
 } from "./platform";
-import { operations, readTables } from "./routes";
+import { operations, readTables, listFilters } from "./routes";
 import { canonicalPassword } from "../../../packages/domain/src/credentials";
 import { provision, credentialChange, reauthenticate } from "./accounts";
 import { upload } from "./files";
@@ -344,23 +344,35 @@ export async function handle(request: Request, env: Env): Promise<Response> {
             .parse(url.searchParams.get("offset") ?? 0),
         ),
       });
-      for (const field of [
-        "id",
-        "version_id",
-        "attempt_id",
-        "group_id",
-        "query_id",
-        "article_id",
-      ]) {
+      for (const [field, type] of Object.entries(listFilters)) {
         const v = url.searchParams.get(field);
         if (v) {
-          uuid.parse(v);
           if (!spec.select.split(",").includes(field))
             throw new ApiError(400, "INVALID_FILTER");
-          params.set(field, `eq.${v}`);
+          const value =
+            type === "uuid"
+              ? uuid.parse(v)
+              : z
+                  .string()
+                  .min(1)
+                  .max(200)
+                  .refine((value) =>
+                    [...value].every((c) => c.charCodeAt(0) >= 32),
+                  )
+                  .parse(v);
+          params.set(field, `eq.${value}`);
         }
       }
-      params.set("order", spec.select.split(",")[0] + ".asc");
+      const ids = spec.select
+        .split(",")
+        .filter((field) => field === "id" || field.endsWith("_id"));
+      params.set(
+        "order",
+        "order" in spec
+          ? spec.order
+          : ids.map((field) => field + ".asc").join(",") ||
+              spec.select.split(",")[0] + ".asc",
+      );
       return json({
         data: await supabase(
           env,

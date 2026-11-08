@@ -50,7 +50,15 @@ export const operations = {
   },
   "students/enroll": {
     rpc: "enroll_student",
-    schema: z.object({ classId: uuid, studentId: uuid, roll: short }).strict(),
+    schema: z
+      .object({
+        classId: uuid,
+        studentId: uuid,
+        roll: short,
+        revision: rev.optional(),
+        reason: short.optional(),
+      })
+      .strict(),
   },
   "accounts/deactivate": {
     rpc: "deactivate_user",
@@ -311,7 +319,71 @@ export const operations = {
   },
   "students/profile": {
     rpc: "edit_student",
-    schema: z.object({ studentId: uuid, name: short, reason: short }).strict(),
+    schema: z
+      .object({ studentId: uuid, revision: rev, name: short, reason: short })
+      .strict(),
+  },
+  "students/list": {
+    rpc: "student_roster",
+    schema: z
+      .object({
+        classId: uuid.optional(),
+        academicYear: short.optional(),
+        includeInactive: z.boolean().optional(),
+        q: z.string().max(100).optional(),
+        limit: z.number().int().min(1).max(100).optional(),
+        offset: z.number().int().min(0).max(10000).optional(),
+      })
+      .strict(),
+  },
+  "students/move": {
+    rpc: "move_student",
+    schema: z
+      .object({
+        studentId: uuid,
+        fromClassId: uuid,
+        toClassId: uuid,
+        roll: short,
+        revision: rev,
+        reason: short,
+      })
+      .strict(),
+  },
+  "students/withdraw": {
+    rpc: "withdraw_enrollment",
+    schema: z
+      .object({ studentId: uuid, classId: uuid, revision: rev, reason: short })
+      .strict(),
+  },
+  "assignments/remove": {
+    rpc: "remove_assignment",
+    schema: z
+      .object({ teacherId: uuid, classId: uuid, subject: short, reason: short })
+      .strict(),
+  },
+  "directory/assigned": {
+    rpc: "assigned_directory",
+    schema: z
+      .object({
+        classId: uuid.optional(),
+        limit: z.number().int().min(1).max(100).optional(),
+        offset: z.number().int().min(0).max(10000).optional(),
+      })
+      .strict(),
+  },
+  "profiles/details": {
+    rpc: "update_profile_details",
+    schema: z
+      .object({
+        profileId: uuid,
+        revision: rev,
+        displayName: short,
+        designation: short,
+        qualifications: text,
+        experience: text,
+        reason: short,
+      })
+      .strict(),
   },
   "students/discover": {
     rpc: "discover_student",
@@ -502,7 +574,80 @@ export const operations = {
       .strict(),
   },
 } as const;
+export const listFilters = {
+  id: "uuid",
+  school_id: "uuid",
+  teacher_id: "uuid",
+  class_id: "uuid",
+  student_id: "uuid",
+  profile_id: "uuid",
+  version_id: "uuid",
+  attempt_id: "uuid",
+  question_id: "uuid",
+  group_id: "uuid",
+  query_id: "uuid",
+  article_id: "uuid",
+  job_id: "uuid",
+  recipient_id: "uuid",
+  role: "text",
+  academic_year: "text",
+  section: "text",
+  subject: "text",
+  state: "text",
+} as const;
 export const readTables = {
+  schools: {
+    table: "schools",
+    select: "id,code,name,timezone,status,public_enabled,indexing_enabled",
+  },
+  subscriptions: {
+    table: "subscriptions",
+    select:
+      "school_id,plan,starts_at,ends_at,teacher_limit,student_limit,ai_limit,storage_limit,insight_limit",
+  },
+  classes: { table: "classes", select: "id,academic_year,name,section" },
+  assignments: {
+    table: "teacher_assignments",
+    select: "teacher_id,class_id,subject",
+    order: "teacher_id.asc,class_id.asc,subject.asc",
+  },
+  users: {
+    table: "memberships",
+    select: "id,role,display_name,active,profile_revision",
+  },
+  enrollments: {
+    table: "enrollments",
+    select: "class_id,student_id,roll,active,revision",
+  },
+  drafts: { table: "question_drafts", select: "id,raw_text,content,revision" },
+  profiles: {
+    table: "teacher_profiles",
+    select:
+      "id,teacher_id,display_name,designation,subjects,classes,approved_fields,visible,audience,revision,published_at",
+  },
+  "professional-updates": {
+    table: "professional_updates",
+    select: "id,profile_id,title,kind,date,approved",
+  },
+  "profile-revisions": {
+    table: "profile_revisions",
+    select: "id,profile_id,author_id,content,state,created_at",
+  },
+  "article-records": {
+    table: "teacher_articles",
+    select:
+      "id,author_id,profile_id,published_revision,audience,published_at,archived,revision",
+  },
+  "import-jobs": { table: "import_jobs", select: "id,state,created_at" },
+  "import-rows": {
+    table: "import_rows",
+    select: "job_id,row_number,state,student_id,error_code,preview",
+    order: "job_id.asc,row_number.asc",
+  },
+  "report-exports": {
+    table: "report_exports",
+    select: "id,filters,status,created_at,expires_at",
+  },
   terms: {
     table: "school_terms",
     select: "id,academic_year,name,starts_at,ends_at,revision",
@@ -536,7 +681,8 @@ export const readTables = {
   },
   posts: {
     table: "posts",
-    select: "id,group_id,title,body,pinned,revision,created_at",
+    order: "pinned.desc,created_at.desc,id.asc",
+    select: "id,group_id,author_id,title,body,pinned,revision,created_at",
   },
   queries: {
     table: "queries",
@@ -549,6 +695,7 @@ export const readTables = {
   },
   "query-cycles": {
     table: "query_cycles",
+    order: "query_id.asc,cycle.asc",
     select:
       "query_id,cycle,teacher_id,policy_hours,policy_revision,started_at,original_due_at,due_at,deadline_revision,first_response_at,solution_delivered_at,student_resolved_at",
   },

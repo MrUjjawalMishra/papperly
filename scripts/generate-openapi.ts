@@ -2,7 +2,7 @@ import { writeFileSync, readFileSync } from "node:fs";
 import process from "node:process";
 import { format } from "prettier";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import { operations, readTables } from "../apps/api/src/routes";
+import { operations, readTables, listFilters } from "../apps/api/src/routes";
 import { login, errorSchema } from "../packages/contracts/src/index";
 import {
   accountInput,
@@ -73,19 +73,15 @@ for (const [route, table] of Object.entries(readTables))
           in: "query",
           schema: { type: "integer", minimum: 0, maximum: 10000, default: 0 },
         },
-        ...[
-          "id",
-          "version_id",
-          "attempt_id",
-          "group_id",
-          "query_id",
-          "article_id",
-        ]
-          .filter((f) => table.select.split(",").includes(f))
-          .map((name) => ({
+        ...Object.entries(listFilters)
+          .filter(([field]) => table.select.split(",").includes(field))
+          .map(([name, type]) => ({
             name,
             in: "query",
-            schema: { type: "string", format: "uuid" },
+            schema:
+              type === "uuid"
+                ? { type: "string", format: "uuid" }
+                : { type: "string", maxLength: 200 },
           })),
       ],
       responses: {

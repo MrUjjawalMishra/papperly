@@ -437,6 +437,7 @@ export type Database = {
         Row: {
           active: boolean;
           class_id: string;
+          revision: number;
           roll: string;
           school_id: string;
           student_id: string;
@@ -444,6 +445,7 @@ export type Database = {
         Insert: {
           active?: boolean;
           class_id: string;
+          revision?: number;
           roll: string;
           school_id: string;
           student_id: string;
@@ -451,6 +453,7 @@ export type Database = {
         Update: {
           active?: boolean;
           class_id?: string;
+          revision?: number;
           roll?: string;
           school_id?: string;
           student_id?: string;
@@ -947,6 +950,7 @@ export type Database = {
           display_name: string;
           id: string;
           must_change_password: boolean;
+          profile_revision: number;
           role: string;
           school_id: string | null;
         };
@@ -959,6 +963,7 @@ export type Database = {
           display_name: string;
           id: string;
           must_change_password?: boolean;
+          profile_revision?: number;
           role: string;
           school_id?: string | null;
         };
@@ -971,6 +976,7 @@ export type Database = {
           display_name?: string;
           id?: string;
           must_change_password?: boolean;
+          profile_revision?: number;
           role?: string;
           school_id?: string | null;
         };
@@ -2111,6 +2117,7 @@ export type Database = {
     Functions: {
       archive_group: { Args: { p: Json }; Returns: undefined };
       assign_teacher: { Args: { p: Json }; Returns: undefined };
+      assigned_directory: { Args: { p: Json }; Returns: Json };
       cancel_exam: { Args: { p: Json }; Returns: undefined };
       change_login: { Args: { p: Json }; Returns: undefined };
       complete_upload: { Args: { p: Json }; Returns: undefined };
@@ -2140,6 +2147,7 @@ export type Database = {
       manage_term: { Args: { p: Json }; Returns: string };
       mark_notification: { Args: { p: Json }; Returns: undefined };
       moderate_article: { Args: { p: Json }; Returns: undefined };
+      move_student: { Args: { p: Json }; Returns: undefined };
       owner_usage: { Args: { p: Json }; Returns: Json };
       prepare_credential_action: { Args: { p: Json }; Returns: Json };
       preview_import: { Args: { p: Json }; Returns: Json };
@@ -2151,6 +2159,7 @@ export type Database = {
       read_post: { Args: { p: Json }; Returns: undefined };
       reassign_resource: { Args: { p: Json }; Returns: undefined };
       record_integrity: { Args: { p: Json }; Returns: string };
+      remove_assignment: { Args: { p: Json }; Returns: undefined };
       reply_query: { Args: { p: Json }; Returns: string };
       request_export: { Args: { p: Json }; Returns: string };
       request_formatting: { Args: { p: Json }; Returns: string };
@@ -2203,11 +2212,14 @@ export type Database = {
       start_attempt: { Args: { p: Json }; Returns: Json };
       student_home: { Args: { p: Json }; Returns: Json };
       student_progress: { Args: { p: Json }; Returns: Json };
+      student_roster: { Args: { p: Json }; Returns: Json };
       submit_attempt: { Args: { p: Json }; Returns: Json };
       support_metadata: { Args: { p: Json }; Returns: Json };
       takeover_attempt: { Args: { p: Json }; Returns: Json };
       transition_query: { Args: { p: Json }; Returns: undefined };
+      update_profile_details: { Args: { p: Json }; Returns: undefined };
       update_subscription: { Args: { p: Json }; Returns: undefined };
+      withdraw_enrollment: { Args: { p: Json }; Returns: undefined };
       write_article: { Args: { p: Json }; Returns: string };
       write_post: { Args: { p: Json }; Returns: string };
     };

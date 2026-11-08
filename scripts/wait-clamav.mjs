@@ -32,7 +32,9 @@ if (!ready) {
     version = (
       await daemonExchange(daemon, "VERSIONCOMMANDS", undefined, 3000)
     ).split("|")[0];
-  } catch {}
+  } catch {
+    // Keep the safe unreachable marker when version diagnostics also fail.
+  }
   console.error(
     JSON.stringify({
       lastError,
