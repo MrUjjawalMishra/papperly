@@ -15,7 +15,15 @@
   },
   "defaultBranch": "feat/backend-v1",
   "defaultBranchNote": "GitHub selected the first pushed branch automatically; no main/staging merge occurred",
-  "cloudflareDeployment": null,
-  "stagingDeploymentWorkflow": "ops/staging-deploy push route configured and attempted; gates passed; blocked on incorrect Supabase server-key type",
+  "cloudflareDeployment": {
+    "id": "608bb699-5c9a-43e4-8ae8-ef07034bc5af",
+    "versionId": "f191ffd4-f1f4-483e-a819-7f64c4563c82",
+    "url": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
+    "sha": "a6e9f2a38a13a001fd9bd0eb02624bae03cac863",
+    "run": 42444357894,
+    "attempt": 3,
+    "basicSmokePassed": true
+  },
+  "stagingDeploymentWorkflow": "Configured and live-tested application-only ops/staging-deploy push route; SQL changes blocked pending migration review/application",
   "stagingProvisioningRun": 42444357894
 }

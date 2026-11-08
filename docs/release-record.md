@@ -1,6 +1,6 @@
 # Current staging database release record — 2026-11-08
 
-Papperly's database schema is applied to the user-confirmed Supabase staging project. The Cloudflare application is not deployed, and full Version 1 acceptance remains incomplete.
+Papperly's database schema is applied to the user-confirmed Supabase staging project. The Cloudflare staging application is deployed and basic-smoke verified; full Version 1 acceptance remains incomplete.
 
 | Field                                   | Verified value                                                                                                                                                                           |
 | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -17,7 +17,7 @@ Papperly's database schema is applied to the user-confirmed Supabase staging pro
 | Local regression                        | 40 tests/ten suites in GitHub CI; lint, TypeScript, formatting, frontend-absence and Worker dry-run build passed                                                                         |
 | Git repository / branch                 | MrUjjawalMishra/papperly / feat/backend-v1; bootstrap push succeeded at 1137da3962b2aee4a2f038dcdbc6b0512437e07f; CI run 42385021596 completed successfully and was verified through MCP |
 | Cloudflare release URL / deployment ID  | None                                                                                                                                                                                     |
-| Automatic CI deployment                 | Application-only staging route triggered; validation passed; deployment blocked by wrong Supabase key type                                                                               |
+| Automatic CI deployment                 | Application-only staging route completed successfully after server-key correction; full acceptance remains outstanding                                                                   |
 | Previous known-good application release | None                                                                                                                                                                                     |
 
 Evidence: supabase-staging-evidence.json, supabase-http-smoke.json, supabase/migration-provenance.json and tests/live/rls-checks.sql. Database TypeScript types were generated from the live schema. The private schema remains outside the exposed Data API schemas. No real users, reusable credentials or student records were provisioned.
@@ -35,3 +35,7 @@ GitHub CI evidence: https://github.com/MrUjjawalMishra/papperly/actions/runs/423
 ## Authorized Cloudflare provisioning attempt
 
 Source a6e9f2a38a13a001fd9bd0eb02624bae03cac863; run https://github.com/MrUjjawalMishra/papperly/actions/runs/42444357894. Validation passed all 40 tests and all required gates. Private bucket papperly-staging-private and Queue papperly-staging-jobs were created in the verified account; private domain settings checked. No Worker, release URL or deployment ID exists. SUPABASE_SERVICE_ROLE_KEY is present but contains a publishable key; the earlier request returned HTTP 401. Replace that environment secret before retrying the failed deploy job. This is not a live backend release or full integration acceptance. See staging-provisioning-evidence.json for exact resource IDs and artifact provenance. No account plan upgrade or production mutation was performed.
+
+## Successful application release
+
+Run 42444357894 attempt 3 completed successfully. Exact release: a6e9f2a38a13a001fd9bd0eb02624bae03cac863; deployment 608bb699-5c9a-43e4-8ae8-ef07034bc5af; Worker version f191ffd4-f1f4-483e-a819-7f64c4563c82. Health/readiness matched this SHA and returned 200; protected results returned 401. Independent public-directory and private-file/report/group/query/support anonymous checks also passed. The initial post-upload ready check returned 404; later CI retry passed without weakened gates. Consumer/schedule configuration was checked separately through the dedicated provider API. No live Auth users or real students were created. Source hardening after this release has 44 passing local tests; it is not called deployed before its own gated release. The previous wrong-key blocker paragraphs above are historical.

@@ -4,6 +4,7 @@ import {
   provisionPrivateResources,
   validateTarget,
   serverKeyMetadata,
+  queueConsumerMatches,
 } from "../scripts/deploy-staging.mjs";
 import { Buffer } from "node:buffer";
 import { readFileSync } from "node:fs";
@@ -17,6 +18,24 @@ const env = {
   CLOUDFLARE_API_TOKEN: crypto.randomUUID(),
   SUPABASE_SERVICE_ROLE_KEY: crypto.randomUUID(),
 };
+it("accepts observed and documented worker consumer field names only for the exact staging Worker", () => {
+  expect(
+    queueConsumerMatches(
+      [{ type: "worker", script: target.worker }],
+      target.worker,
+    ),
+  ).toBe(true);
+  expect(
+    queueConsumerMatches(
+      [{ type: "worker", script_name: target.worker }],
+      target.worker,
+    ),
+  ).toBe(true);
+  expect(
+    queueConsumerMatches([{ type: "worker", script: "other" }], target.worker),
+  ).toBe(false);
+  expect(queueConsumerMatches([], target.worker)).toBe(false);
+});
 it("reports only key-type and role/project/expiry checks without disclosing credentials", () => {
   const jwt = (claims) =>
     [

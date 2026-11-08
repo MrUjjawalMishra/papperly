@@ -2,8 +2,8 @@
   "repository": "MrUjjawalMishra/papperly",
   "cloudflareAccountId": "e746f9041a0f5eddfd51c206531b3393",
   "supabaseProjectRef": "soudjtewvquywncqtwyo",
-  "apiUrl": null,
-  "verified": false,
+  "apiUrl": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
+  "verified": true,
   "supabaseVerified": true,
   "supabaseApiUrl": "https://soudjtewvquywncqtwyo.supabase.co",
   "githubCredentialEnvironment": "Cloudflare",
@@ -12,5 +12,7 @@
   "cloudflareBucket": "papperly-staging-private",
   "cloudflareQueue": "papperly-staging-jobs",
   "cloudflareQueueId": "f80c4cea111642e9aa2e0794d3854f2c",
-  "cloudflarePrivateResourcesVerified": true
+  "cloudflarePrivateResourcesVerified": true,
+  "cloudflareWorker": "papperly-api-staging",
+  "cloudflareDeploymentId": "608bb699-5c9a-43e4-8ae8-ef07034bc5af"
 }

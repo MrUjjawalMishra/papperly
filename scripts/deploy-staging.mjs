@@ -43,6 +43,18 @@ export function serverKeyMetadata(value, projectRef) {
   }
 }
 
+export function queueConsumerMatches(consumers, worker) {
+  return (
+    Array.isArray(consumers) &&
+    consumers.some(
+      (c) =>
+        c.type === "worker" &&
+        (c.script_name ?? (typeof c.script === "string" ? c.script : null)) ===
+          worker,
+    )
+  );
+}
+
 export function migrationDigest(directory = "supabase/migrations") {
   const h = createHash("sha256");
   for (const name of readdirSync(directory)
@@ -374,10 +386,15 @@ async function main() {
     report.scheduleConfigured =
       Array.isArray(schedules?.schedules) &&
       schedules.schedules.some((s) => s.cron === "* * * * *");
-    const queue = (await api(`/queues/${report.resources.queueId}`)).result;
-    report.queueConsumerConfigured =
-      Array.isArray(queue?.consumers) &&
-      queue.consumers.some((c) => c.script_name === target.worker);
+    const consumers = (
+      await api(`/queues/${report.resources.queueId}/consumers`)
+    ).result;
+    report.queueConsumerConfigured = queueConsumerMatches(
+      consumers,
+      target.worker,
+    );
+    if (!report.queueConsumerConfigured || !report.scheduleConfigured)
+      throw Error("Staging Queue consumer or schedule is not verified");
     // Metadata checks do not prove a scheduled invocation or message delivery succeeded.
     save();
     const smoke = spawnSync(process.execPath, ["scripts/live-smoke.mjs"], {

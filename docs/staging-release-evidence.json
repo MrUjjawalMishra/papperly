@@ -1,0 +1,42 @@
+{
+  "environment": "staging",
+  "accountId": "e746f9041a0f5eddfd51c206531b3393",
+  "commit": "a6e9f2a38a13a001fd9bd0eb02624bae03cac863",
+  "migrationVersion": "20261107142655",
+  "migrationDigest": "674350292d48afb93710d6426f1e7fd8cd4bd44703bf7b06c486ec15001a008d",
+  "startedAt": "2026-11-08T04:25:03.807Z",
+  "deployed": true,
+  "serverKeyMetadata": {
+    "kind": "secret",
+    "formatValid": true
+  },
+  "resources": {
+    "bucket": "papperly-staging-private",
+    "bucketCreated": false,
+    "privateAccessVerified": true,
+    "queue": "papperly-staging-jobs",
+    "queueId": "f80c4cea111642e9aa2e0794d3854f2c",
+    "queueCreated": false
+  },
+  "supabaseServiceKeyVerified": true,
+  "billing": {
+    "planReadAvailable": false,
+    "upgradePerformed": false
+  },
+  "previousDeploymentId": "78893a98-3b0f-4f62-967f-1793422aa92e",
+  "apiUrl": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
+  "deploymentId": "608bb699-5c9a-43e4-8ae8-ef07034bc5af",
+  "bindingsVerified": true,
+  "scheduleConfigured": true,
+  "queueConsumerConfigured": false,
+  "basicSmokePassed": true,
+  "completedAt": "2026-11-08T04:25:12.969Z",
+  "limitations": "Basic release smoke only; full multi-role, scheduled/queue processing, file, external-provider and load/restore acceptance remains outstanding. No real student provisioning or frontend deployed.",
+  "runId": 42444357894,
+  "attempt": 3,
+  "runUrl": "https://github.com/MrUjjawalMishra/papperly/actions/runs/42444357894/attempts/3",
+  "workerVersionId": "f191ffd4-f1f4-483e-a819-7f64c4563c82",
+  "verificationRoute": "GitHub MCP retry/status/logs; GitHub Actions Cloudflare REST/Wrangler; independent HTTPS checks",
+  "queueConsumerNote": "False above was a metadata-check field/endpoint mismatch; separate provider inspection 42446871351 confirmed script=papperly-api-staging via GET /queues/{id}/consumers.",
+  "queueConsumerInspectionVerified": true
+}
