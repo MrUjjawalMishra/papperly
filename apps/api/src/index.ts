@@ -1,5 +1,13 @@
 import { z, ZodError } from "zod";
 import { login, uuid } from "../../../packages/contracts/src/index";
+import {
+  authLoginResponse,
+  authSessionResponse,
+  passwordChangeResponse,
+  reauthenticationInput,
+  accountProvisionResponse,
+  importConfirmationResponse,
+} from "../../../packages/contracts/src/auth";
 import { validatePaper } from "../../../packages/domain/src/index";
 import {
   ApiError,
@@ -13,6 +21,9 @@ import {
   randomToken,
   type Env,
   type Tokens,
+  authProvider,
+  trustedClientAddress,
+  authFailure,
 } from "./platform";
 import { operations, readTables } from "./routes";
 import { canonicalPassword } from "../../../packages/domain/src/credentials";
@@ -63,9 +74,15 @@ export async function handle(request: Request, env: Env): Promise<Response> {
     headers.set("Access-Control-Allow-Origin", origin);
     headers.set("Access-Control-Allow-Credentials", "true");
     headers.set("Vary", "Origin");
+    headers.set("Access-Control-Expose-Headers", "X-Request-ID,Retry-After");
   }
   const json = (data: unknown, status = 200) =>
     new Response(JSON.stringify(data), { status, headers });
+  const contractJson = (schema: z.ZodType, data: unknown) => {
+    const parsed = schema.safeParse(data);
+    if (!parsed.success) throw new ApiError(500, "RESPONSE_VALIDATION_FAILED");
+    return json(parsed.data);
+  };
   try {
     const url = new URL(request.url);
     if (request.method === "OPTIONS") {
@@ -130,17 +147,17 @@ export async function handle(request: Request, env: Env): Promise<Response> {
       if (!user) throw new ApiError(401, "INVALID_CREDENTIALS");
       let tokens: Tokens;
       try {
-        tokens = (await supabase(
+        tokens = (await authProvider(
           env,
           "/auth/v1/token?grant_type=password",
-          env.SUPABASE_ANON_KEY,
           {
             email: `${user.id}@${env.AUTH_ALIAS_DOMAIN}`,
             password: canonicalPassword(input.password, user.role, user.policy),
           },
+          trustedClientAddress(request),
         )) as Tokens;
-      } catch {
-        throw new ApiError(401, "INVALID_CREDENTIALS");
+      } catch (e) {
+        throw authFailure(e);
       }
       const opaque = randomToken(),
         csrfToken = randomToken();
@@ -159,7 +176,10 @@ export async function handle(request: Request, env: Env): Promise<Response> {
         "Set-Cookie",
         `__Host-papperly=${opaque}; Secure; HttpOnly; SameSite=Strict; Path=/`,
       );
-      return json({ user: { id: user.id, role: user.role }, csrfToken });
+      return contractJson(authLoginResponse, {
+        user: { id: user.id, role: user.role },
+        csrfToken,
+      });
     }
     if (url.pathname === "/v1/public/directory" && request.method === "GET") {
       await limited(request, env, "public-directory", 30);
@@ -201,7 +221,7 @@ export async function handle(request: Request, env: Env): Promise<Response> {
     await limited(request, env, "api:" + s.userId, 180);
     if (request.method !== "GET") await csrf(request, env, s);
     if (url.pathname === "/v1/auth/session" && request.method === "GET")
-      return json({
+      return contractJson(authSessionResponse, {
         user: { id: s.userId, role: s.role },
         expiresAt: s.expiresAt,
         csrfToken: s.csrfToken,
@@ -220,25 +240,25 @@ export async function handle(request: Request, env: Env): Promise<Response> {
         env,
         s,
         await body(request),
+        trustedClientAddress(request),
       );
       if (_cookie) headers.append("Set-Cookie", _cookie);
-      return json({ data });
+      return contractJson(passwordChangeResponse, { data });
     }
     if (
       url.pathname === "/v1/auth/reauthenticate" &&
       request.method === "POST"
     ) {
-      const p = z
-        .object({ password: z.string().max(256) })
-        .strict()
-        .parse(await body(request));
-      await reauthenticate(env, s, p.password);
+      const p = reauthenticationInput.parse(await body(request));
+      await reauthenticate(env, s, p.password, trustedClientAddress(request));
       return json({ ok: true });
     }
     if (s.mustChangePassword)
       throw new ApiError(403, "PASSWORD_CHANGE_REQUIRED");
     if (url.pathname === "/v1/accounts" && request.method === "POST")
-      return json({ data: await provision(env, s, await body(request)) });
+      return contractJson(accountProvisionResponse, {
+        data: await provision(env, s, await body(request)),
+      });
     const route = url.pathname.slice(4);
     if (route === "attempts/takeover" && request.method === "POST") {
       const p = z
@@ -249,7 +269,7 @@ export async function handle(request: Request, env: Env): Promise<Response> {
         })
         .strict()
         .parse(await body(request));
-      await reauthenticate(env, s, p.password);
+      await reauthenticate(env, s, p.password, trustedClientAddress(request));
       return json({
         data: await rpc(env, "runtime_takeover", {
           attemptId: p.attemptId,
@@ -271,7 +291,9 @@ export async function handle(request: Request, env: Env): Promise<Response> {
     if (route === "imports/preview" && request.method === "POST")
       return json({ data: await importPreview(request, env, s) });
     if (route === "imports/confirm" && request.method === "POST")
-      return json({ data: await importConfirm(await body(request), env, s) });
+      return contractJson(importConfirmationResponse, {
+        data: await importConfirm(await body(request), env, s),
+      });
     if (
       route === "support/metadata" &&
       Date.now() - Date.parse(s.reauthenticatedAt) > 300000
@@ -391,6 +413,8 @@ export async function handle(request: Request, env: Env): Promise<Response> {
         : e instanceof ZodError
           ? new ApiError(400, "VALIDATION_FAILED")
           : new ApiError(500, "INTERNAL_ERROR");
+    if (error.status === 429 && error.retryAfterSeconds)
+      headers.set("Retry-After", String(error.retryAfterSeconds));
     return json(
       {
         error: {

@@ -1,0 +1,118 @@
+{
+  "environment": "staging",
+  "base": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
+  "tag": "84656d5f",
+  "sourceCommit": "b075cfe1f89aa65de7ef359cd981045ad4e0250b",
+  "startedAt": "2026-11-08T05:16:05.555Z",
+  "checks": [
+    {
+      "name": "verified live release and public signup disabled",
+      "passed": true,
+      "durationMs": 829
+    },
+    {
+      "name": "restricted synthetic owner bootstrap and fresh-session password change",
+      "passed": true,
+      "durationMs": 5922
+    },
+    {
+      "name": "owner provisions two schools, administrators and teachers",
+      "passed": true,
+      "durationMs": 21459
+    },
+    {
+      "name": "tenant isolation and unauthorized role escalation",
+      "passed": true,
+      "durationMs": 2343
+    },
+    {
+      "name": "50 synthetic students provisioned through the assigned teacher",
+      "passed": false
+    }
+  ],
+  "resources": {
+    "schools": [
+      "c136a962-ebf8-4f51-82aa-bcb407f04cda",
+      "95311d53-1b08-45c5-97a5-b47f39d5b530"
+    ],
+    "users": [
+      "be069baa-9046-459c-b238-e26ae6580645",
+      "3416ae06-87ef-43d6-a2ed-724fdf703a37",
+      "b909acf2-5dc0-4344-98c5-78f8eb3af554",
+      "57b6e50c-c83b-4e2f-891f-81b1c50badae",
+      "441ffc3a-84fc-4c82-ad90-4d70d16116b5",
+      "259251c9-582b-42d7-a51f-cc0eee99134d",
+      "82d131ac-ea7c-4d72-ae7b-2710ab081356",
+      "94c51b15-2a49-42f5-a42d-2b0e4b410b07",
+      "ffa1a5dc-3349-4b41-bd40-df0b351e4248",
+      "a17a0f4f-3a87-4fdc-b8db-4ab6ccb240ef",
+      "27085afa-d354-4d40-afc0-d4ffc47b66ce",
+      "323507c3-0427-480a-b788-5a9355af6f09",
+      "3797a37d-4840-4d89-ba0a-32922f9be57c",
+      "46425504-8b7d-409a-b014-2e1f43caed6c",
+      "8aa3fb09-ce06-4198-a95e-071e584ad495",
+      "b51ee815-de2f-4def-a510-0293014f9664",
+      "e68d2fb6-f809-4668-b6c0-9ad23b21ffc8",
+      "1bed6c14-9925-4124-af80-b7cfe3e7f967",
+      "df21622e-3c28-461a-af8d-0491031bec25",
+      "fc376a66-daa0-4af0-84d1-308607b4c514",
+      "a62c2887-1924-4e4a-9c7e-4cc3e847f0e6",
+      "8a74d9a5-ba6c-4685-bb79-838f32341859",
+      "60e765f4-92f2-44c9-b1bd-a361e08f0a3b",
+      "52834f06-338a-4f22-b6aa-65bd6f4d5b47",
+      "a7ba9ec4-d568-4090-9823-077d50a28061",
+      "4d71a09b-8483-4843-8853-8a0f0e1ee60a",
+      "8c3b333b-6d97-42bd-9de0-f0bb3cd4f227",
+      "c0ff7254-c94e-4cea-b0d6-b5467e59c6db",
+      "ee1325e1-280d-40a6-b109-cb2a3d1c14b0",
+      "f72ce5fa-1800-4668-8594-177bb82ad54d",
+      "a3d39dce-e05d-404f-b005-4d4d8d72572a",
+      "33694a99-50ed-4f68-befc-a0a00315eaa6",
+      "1acb6c89-7db8-413d-93d9-d5fad5aa9ff9",
+      "5d6308bd-c37e-4f1e-a931-9c62674e36f1",
+      "db6dce06-ae7e-4216-b405-23d89dc949c5",
+      "c3f5fe3a-72ac-4590-ae83-4ef9d5b23301",
+      "8910d387-8a9b-4699-8598-313dd1759985",
+      "406a2adc-8038-45c5-90b6-ac33cedfd2b5",
+      "111e73d2-9587-4b5d-aeda-68afeecf40c9",
+      "1e74c0fc-2bef-480f-a3f4-5814bc6ac4f0",
+      "43ad9738-4e51-4c7b-90a8-39919f4d781b",
+      "538bb5b6-5a14-41fc-90b9-0025cd4e0fa7",
+      "fbab4841-060c-402d-8ab6-442803e84115",
+      "316e1134-37b0-4e9e-b486-eedcf2313b5e",
+      "66974e19-e028-47c7-94a9-73fd385ff161",
+      "aeacdbe4-904d-4649-980f-ae6249535778",
+      "486cee49-1fba-4e84-a777-1a7ed89c0087",
+      "ee15b3dd-8f33-485b-b675-1366780df779",
+      "5a8c25ea-f1b4-4523-833a-282f3131abdc",
+      "cc2238f2-ca78-405e-8074-7a1b9dc15098",
+      "3e85ccba-573e-4da2-ba7d-f35b7d2d0b4c",
+      "2d616852-ba45-4f5b-b83c-934629ce65eb",
+      "4ff316bd-045f-4133-960c-62b66c079a0a",
+      "d78e16c6-6f9d-4f6f-8f16-019e78c9dad3",
+      "971eafde-e691-477e-bd0e-054be260be12",
+      "5ef4edd3-1925-4574-848d-feb1326f6b7c"
+    ]
+  },
+  "passed": false,
+  "cleanup": {
+    "authUsersRemoved": true,
+    "membershipsDeactivated": true,
+    "schoolsSuspended": true,
+    "syntheticAuditAndExamEvidenceRetained": true
+  },
+  "deployedRelease": "b075cfe1f89aa65de7ef359cd981045ad4e0250b",
+  "publicSignupDisabled": true,
+  "error": "/v1/auth/login: expected 200, received 401; code INVALID_CREDENTIALS",
+  "completedAt": "2026-11-08T05:17:37.352Z",
+  "limitations": "Synthetic staging workflow only. Provider AI/scanning unavailable, uploads stay quarantined. Audit and synthetic exam rows retained with inactive identities. Native load target is measured, not assumed passed; PDF/restore/retention and exhaustive FR matrix remain separate.",
+  "runId": 42450078951,
+  "runUrl": "https://github.com/MrUjjawalMishra/papperly/actions/runs/42450078951",
+  "artifactId": 13605281539,
+  "artifactDigest": "sha256:91faa85ee7adfd469ecc1908d2a8f0db9a614fb67364712f69178d2f88f946a4",
+  "diagnostic": {
+    "studentAccounts": 51,
+    "studentsSignedInBeforeFailure": 32,
+    "assessment": "Pattern consistent with documented Auth token bucket. Prior adapter mapped provider failures, including throttling, to invalid credentials; raw historical provider status was not captured."
+  }
+}

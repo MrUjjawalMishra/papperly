@@ -1,5 +1,9 @@
-import { z } from "zod";
-import { uuid } from "../../../packages/contracts/src/index";
+import type { z } from "zod";
+import {
+  accountInput,
+  credentialChangeInput,
+} from "../../../packages/contracts/src/auth";
+export { accountInput };
 import {
   canonicalPassword,
   provisionalCredential,
@@ -14,24 +18,9 @@ import {
   type Tokens,
   type Env,
   type Session,
+  authProvider,
+  authFailure,
 } from "./platform";
-export const accountInput = z
-  .object({
-    schoolId: uuid.optional(),
-    role: z.enum(["administrator", "teacher", "student"]),
-    identityKey: z.string().min(1).max(200),
-    name: z.string().min(1).max(200),
-    loginId: z
-      .string()
-      .regex(/^[a-zA-Z0-9._-]{3,64}$/)
-      .optional(),
-    classId: uuid.optional(),
-    className: z.string().max(50).optional(),
-    section: z.string().max(50).optional(),
-    roll: z.string().max(50).optional(),
-    admissionNumber: z.string().max(100).optional(),
-  })
-  .strict();
 export async function provision(env: Env, s: Session, input: unknown) {
   const p = accountInput.parse(input);
   if (
@@ -127,38 +116,40 @@ export async function provision(env: Env, s: Session, input: unknown) {
     throw e;
   }
 }
-export async function reauthenticate(env: Env, s: Session, password: string) {
+export async function reauthenticate(
+  env: Env,
+  s: Session,
+  password: string,
+  clientIp?: string,
+) {
   const user = await rpc<{ id: string; role: string; policy: string }>(
     env,
     "runtime_credentials",
     { userId: s.userId },
   );
   try {
-    await supabase(
+    await authProvider(
       env,
       "/auth/v1/token?grant_type=password",
-      env.SUPABASE_ANON_KEY,
       {
         email: `${s.userId}@${env.AUTH_ALIAS_DOMAIN}`,
         password: canonicalPassword(password, user.role, user.policy),
       },
+      clientIp,
     );
-  } catch {
-    throw new ApiError(401, "INVALID_CREDENTIALS");
+  } catch (e) {
+    throw authFailure(e);
   }
   await rpc(env, "runtime_reauthenticated", { hash: s.hash });
 }
-export async function credentialChange(env: Env, s: Session, input: unknown) {
-  const p = z
-    .object({
-      userId: uuid,
-      currentPassword: z.string().max(256),
-      newPassword: z.string().max(256).optional(),
-      reason: z.string().min(1).max(200),
-    })
-    .strict()
-    .parse(input);
-  await reauthenticate(env, s, p.currentPassword);
+export async function credentialChange(
+  env: Env,
+  s: Session,
+  input: unknown,
+  clientIp?: string,
+) {
+  const p = credentialChangeInput.parse(input);
+  await reauthenticate(env, s, p.currentPassword, clientIp);
   const target = await rpc<{ id: string; role: string; policy: string }>(
     env,
     "prepare_credential_action",
@@ -184,11 +175,11 @@ export async function credentialChange(env: Env, s: Session, input: unknown) {
     "PUT",
   );
   if (p.userId === s.userId) {
-    const tokens = (await supabase(
+    const tokens = (await authProvider(
       env,
       "/auth/v1/token?grant_type=password",
-      env.SUPABASE_ANON_KEY,
       { email: `${s.userId}@${env.AUTH_ALIAS_DOMAIN}`, password: canonical },
+      clientIp,
     )) as Tokens;
     const user = await rpc<{ credentialVersion: number }>(
       env,

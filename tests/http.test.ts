@@ -18,6 +18,7 @@ const env = {
 } as Env;
 const testPassword = "Synthetic" + crypto.randomUUID().replaceAll("-", "");
 let providerPassword = testPassword.toLowerCase();
+let simulateAuthRateLimit = false;
 const request = (
   path: string,
   p?: unknown,
@@ -53,6 +54,11 @@ beforeAll(async () => {
         ? (JSON.parse(String(init.body)) as Record<string, unknown>)
         : {};
       if (url.pathname === "/auth/v1/token") {
+        if (simulateAuthRateLimit)
+          return Response.json(
+            { message: "Upstream throttling" },
+            { status: 429, headers: { "Retry-After": "2" } },
+          );
         if (p.password !== providerPassword)
           return Response.json({ message: "invalid" }, { status: 400 });
         return Response.json({
@@ -219,4 +225,25 @@ it("self password change sets a fresh HttpOnly cookie, hides internal cookie dat
     (await handle(request("/v1/auth/session", undefined, newCookie), env))
       .status,
   ).toBe(200);
+});
+it("returns provider throttling as 429 with Retry-After and never establishes a session", async () => {
+  simulateAuthRateLimit = true;
+  try {
+    const response = await handle(
+      request("/v1/auth/login", {
+        schoolCode: "oak",
+        loginId: "student.9b15",
+        password: testPassword,
+      }),
+      env,
+    );
+    expect(response.status).toBe(429);
+    expect(response.headers.get("Retry-After")).toBe("2");
+    expect(response.headers.has("Set-Cookie")).toBe(false);
+    expect(
+      ((await response.json()) as { error: { code: string } }).error.code,
+    ).toBe("RATE_LIMITED");
+  } finally {
+    simulateAuthRateLimit = false;
+  }
 });

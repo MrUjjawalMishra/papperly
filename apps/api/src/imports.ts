@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { uuid } from "../../../packages/contracts/src/index";
+import { importConfirmationInput } from "../../../packages/contracts/src/auth";
 import {
   parseRoster,
   rosterTemplate,
@@ -59,13 +60,7 @@ export async function importPreview(request: Request, env: Env, s: Session) {
   );
 }
 export async function importConfirm(input: unknown, env: Env, s: Session) {
-  const p = z
-    .object({
-      jobId: uuid,
-      rows: z.array(z.number().int().min(2).max(301)).max(300),
-    })
-    .strict()
-    .parse(input);
+  const p = importConfirmationInput.parse(input);
   const rows = await rpc<
     {
       row: number;

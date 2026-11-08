@@ -354,6 +354,8 @@ async function main() {
       `ALLOWED_ORIGINS:${apiUrl}`,
       "--var",
       `AUTH_ALIAS_DOMAIN:${target.authAliasDomain}`,
+      "--var",
+      `AUTH_IP_FORWARDING:${target.authIpForwardingEnabled === true ? "true" : "false"}`,
       "--message",
       `Papperly staging ${env.GITHUB_SHA}`,
     ];

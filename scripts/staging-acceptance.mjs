@@ -111,15 +111,29 @@ class Client {
     return (await this.request("/v1/" + path, body, expected)).data?.data;
   }
   async login(owner = false, password = this.password, expected = 200) {
-    const r = await this.request(
-      owner ? "/v1/auth/owner-login" : "/v1/auth/login",
-      {
-        schoolCode: this.schoolCode || "platform",
-        loginId: this.loginId || "owner",
-        password,
-      },
-      expected,
-    );
+    let r;
+    for (let attempt = 0; attempt < 8; attempt++) {
+      r = await this.request(
+        owner ? "/v1/auth/owner-login" : "/v1/auth/login",
+        {
+          schoolCode: this.schoolCode || "platform",
+          loginId: this.loginId || "owner",
+          password,
+        },
+        expected === 200 ? [200, 429] : expected,
+      );
+      if (r.status !== 429) break;
+      report.authSetupRateLimitsObserved =
+        (report.authSetupRateLimitsObserved ?? 0) + 1;
+      if (attempt === 7)
+        throw Error("Auth setup remained rate-limited after bounded retries");
+      await delay(
+        Math.min(
+          30000,
+          Math.max(1000, Number(r.headers.get("retry-after") ?? 3) * 1000),
+        ),
+      );
+    }
     if (expected === 200) this.userId = r.data.user.id;
     return r;
   }
@@ -375,10 +389,16 @@ try {
         admissionNumber: `other-${tag}`,
       });
       await b.student.login();
-      for (let start = 0; start < students.length; start += 10)
-        await Promise.all(
-          students.slice(start, start + 10).map((s) => s.login()),
-        );
+      report.authSetup = {
+        paced: true,
+        minimumDelayMs: 2200,
+        reason:
+          "Provider token endpoint has a documented 30-request burst bucket; the 50-user answer/save benchmark starts only after sessions exist.",
+      };
+      for (const s of students) {
+        await s.login();
+        await delay(2200);
+      }
       await students[0].login(false, students[0].password.toUpperCase());
       await students[0].call(
         "accounts",

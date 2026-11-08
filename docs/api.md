@@ -1,6 +1,6 @@
 # API contract
 
-Committed machine-readable contract: openapi.json. Runtime schemas: packages/contracts/src and apps/api/src/routes.ts. The request schemas and route catalogue are generated; ancillary response schemas remain broader than their actual DTOs and are explicitly tracked as unfinished contract work. There is no documentation UI.
+Committed machine-readable contract: openapi.json. Runtime schemas: packages/contracts/src and apps/api/src/routes.ts. The request schemas and route catalogue are generated. Auth/session, password change, account provisioning and import confirmation now have shared runtime request/response schemas. Other ancillary response schemas remain broader than their actual DTOs and are explicitly tracked as unfinished contract work. There is no documentation UI.
 
 Base path `/v1`. Health/readiness are `/healthz` and `/readyz`. JSON operations return `{ "data": ... }`; login/session return their explicit session object. Errors always contain `{ "error": { "code": "FORBIDDEN", "message": "FORBIDDEN", "requestId": "UUID" } }`, never raw provider/database error text. Validation 400; missing/expired session 401; forbidden/CSRF 403; optimistic conflict/deadline 409; rate limit 429; missing integration/unready 503. Unknown routes return 404. Bodies are bounded to 1 MiB except raw XLSX/file uploads with 5/10 MiB limits.
 
@@ -32,3 +32,7 @@ POST `/files/upload?postId=UUID` or `?messageId=UUID`: raw binary, X-Filename, C
 Timestamps are UTC ISO 8601 with offsets; school timezone defaults Asia/Kolkata. Dates/periods are explicit. Snapshot versions and revision fields are optimistic concurrency controls. No custom frontend, dashboards, CSS or HTML is delivered.
 
 A successful self-password change sets a fresh Secure HttpOnly session cookie and returns a fresh CSRF token under `data.csrfToken`; the internal cookie value is never returned as a JSON field. Use the new CSRF token for subsequent mutations. Staff reset instead returns the newly issued credential once, with all target sessions revoked.
+
+Authentication provider throttling returns HTTP 429 / RATE_LIMITED with a bounded Retry-After header; it is not an invalid-password response. Network/provider unavailability returns 503 / AUTH_UNAVAILABLE. Supabase uses a token bucket with a burst of 30; setup for the 50-examinee pilot paces login, not answer-save/submission traffic. Guarded IP forwarding uses only Cloudflare CF-Connecting-IP with a modern server Secret key; arbitrary X-Forwarded-For is ignored. AUTH_IP_FORWARDING is enabled only after the Supabase dashboard setting is confirmed.
+
+Run `npm run contracts:generate` after changing schemas and `npm run contracts:check` to detect stale OpenAPI without rewriting it. The generated specification targets OpenAPI 3.0 and is validated in automated tests.

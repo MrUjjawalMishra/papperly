@@ -1,4 +1,5 @@
 import { z } from "zod";
+export * from "./auth";
 export const uuid = z.string().uuid();
 export const marks = z.number().int().min(0).max(100000); // hundredths of a mark
 const option = z

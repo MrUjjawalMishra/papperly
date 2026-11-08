@@ -6,6 +6,7 @@ export interface Env {
   AUTH_ALIAS_DOMAIN: string;
   ALLOWED_ORIGINS: string;
   OWNER_USER_ID?: string;
+  AUTH_IP_FORWARDING?: "true" | "false";
   ENVIRONMENT: "development" | "staging" | "production";
   RELEASE_SHA?: string;
   SCANNER_ENDPOINT?: string;
@@ -22,6 +23,7 @@ export class ApiError extends Error {
     public code: string,
     message = code,
     public upstreamStatus?: number,
+    public retryAfterSeconds?: number,
   ) {
     super(message);
   }
@@ -32,6 +34,7 @@ export async function supabase(
   token: string,
   body?: unknown,
   method = body === undefined ? "GET" : "POST",
+  extraHeaders: Record<string, string> = {},
 ) {
   const response = await fetch(env.SUPABASE_URL + path, {
     method,
@@ -44,12 +47,25 @@ export async function supabase(
         ? {}
         : { Authorization: `Bearer ${token}` }),
       "Content-Type": "application/json",
+      ...extraHeaders,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
     signal: AbortSignal.timeout(10000),
   });
   const data: unknown = await response.json().catch(() => null);
   if (!response.ok) {
+    if (response.status === 429) {
+      const retry = Number(response.headers.get("Retry-After") ?? 3);
+      throw new ApiError(
+        429,
+        "RATE_LIMITED",
+        "Upstream service rate limit",
+        429,
+        Number.isFinite(retry)
+          ? Math.max(1, Math.min(300, Math.ceil(retry)))
+          : 3,
+      );
+    }
     const code =
       typeof data === "object" && data !== null && "message" in data
         ? String(data.message)
@@ -66,6 +82,67 @@ export async function supabase(
     );
   }
   return data;
+}
+export function trustedClientAddress(request: Request) {
+  // Cloudflare overwrites CF-Connecting-IP. Never trust client X-Forwarded-For.
+  const ip = request.headers.get("CF-Connecting-IP") ?? "";
+  const parts = ip.split(".");
+  if (
+    parts.length === 4 &&
+    parts.every((p) => /^\d{1,3}$/.test(p) && Number(p) <= 255)
+  )
+    return ip;
+  if (!/^[a-f0-9:]{2,39}$/i.test(ip)) return undefined;
+  if (ip.includes(":::")) return undefined;
+  const halves = ip.split("::"),
+    groups = ip.split(":").filter(Boolean);
+  if (
+    groups.every((p) => p.length <= 4) &&
+    (halves.length === 1
+      ? groups.length === 8 && !ip.startsWith(":") && !ip.endsWith(":")
+      : halves.length === 2 && groups.length < 8)
+  )
+    return ip;
+  return undefined;
+}
+export function authFailure(error: unknown) {
+  if (error instanceof ApiError) {
+    if (error.status === 429) return error;
+    if (
+      [400, 401, 422].includes(error.upstreamStatus ?? 0) &&
+      error.code !== "Invalid API key"
+    )
+      return new ApiError(401, "INVALID_CREDENTIALS");
+  } else if (
+    error instanceof Error &&
+    ["STAFF_PASSWORD_LENGTH", "STUDENT_PASSWORD_ASCII_8_128_REQUIRED"].includes(
+      error.message,
+    )
+  ) {
+    return new ApiError(401, "INVALID_CREDENTIALS");
+  }
+  return new ApiError(503, "AUTH_UNAVAILABLE");
+}
+export function authProvider(
+  env: Env,
+  path: string,
+  body: unknown,
+  clientIp?: string,
+) {
+  const forwarding = env.AUTH_IP_FORWARDING === "true";
+  if (
+    forwarding &&
+    (!clientIp || !env.SUPABASE_SERVICE_ROLE_KEY.startsWith("sb_secret_"))
+  )
+    throw new ApiError(503, "AUTH_FORWARDING_UNAVAILABLE");
+  return supabase(
+    env,
+    path,
+    forwarding ? env.SUPABASE_SERVICE_ROLE_KEY : env.SUPABASE_ANON_KEY,
+    body,
+    "POST",
+    forwarding ? { "Sb-Forwarded-For": clientIp! } : {},
+  );
 }
 export const rpc = async <T = unknown>(
   env: Env,
@@ -157,11 +234,11 @@ export async function session(request: Request, env: Env): Promise<Session> {
   if (!row) throw new ApiError(401, "SESSION_EXPIRED");
   let tokens = await unseal<Tokens>(env, row.tokens);
   if (tokens.expires_at <= Date.now() / 1000 + 60) {
-    const refreshed = (await supabase(
+    const refreshed = (await authProvider(
       env,
       "/auth/v1/token?grant_type=refresh_token",
-      env.SUPABASE_ANON_KEY,
       { refresh_token: tokens.refresh_token },
+      trustedClientAddress(request),
     )) as Tokens;
     tokens = {
       ...refreshed,
