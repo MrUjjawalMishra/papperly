@@ -7,8 +7,8 @@
   "workersSubdomain": "mr-ujjawalmishra",
   "supabaseUrl": "https://soudjtewvquywncqtwyo.supabase.co",
   "supabasePublishableKey": "sb_publishable_v_L5PLJvoKtiWhE0WenLMw_VBUZw39I",
-  "migrationDigest": "674350292d48afb93710d6426f1e7fd8cd4bd44703bf7b06c486ec15001a008d",
-  "migrationVersion": "20261107142655",
+  "migrationDigest": "ab86c8a5e626b3e32bcf374f750c791bdef39f6093a447f9aacbaf5687c9cc67",
+  "migrationVersion": "20261108050823",
   "migrationVerifiedAt": "2026-11-08",
   "authorization": "User approved staging Worker, private R2 and Queue creation and required paid-plan upgrades on 2026-11-08; no production changes.",
   "authAliasDomain": "identities.staging.papperly.invalid"

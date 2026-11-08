@@ -74,10 +74,10 @@ export async function provision(env: Env, s: Session, input: unknown) {
         );
         exists = true;
       } catch (e) {
-        if (!(e instanceof ApiError) || e.status >= 500) throw e;
+        if (!(e instanceof ApiError) || e.upstreamStatus !== 404) throw e;
       }
       if (!exists) {
-        await supabase(
+        const created = (await supabase(
           env,
           "/auth/v1/admin/users",
           env.SUPABASE_SERVICE_ROLE_KEY,
@@ -94,7 +94,9 @@ export async function provision(env: Env, s: Session, input: unknown) {
             email_confirm: true,
             app_metadata: { papperly: true },
           },
-        );
+        )) as { id?: string };
+        if (created.id !== job.id)
+          throw new ApiError(503, "AUTH_IDENTITY_MISMATCH");
         issued = true;
       }
       await rpc(env, "runtime_provision_auth", { id: job.id });

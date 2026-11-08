@@ -21,6 +21,7 @@ export class ApiError extends Error {
     public status: number,
     public code: string,
     message = code,
+    public upstreamStatus?: number,
   ) {
     super(message);
   }
@@ -60,6 +61,8 @@ export async function supabase(
           ? 503
           : 409,
       code,
+      code,
+      response.status,
     );
   }
   return data;

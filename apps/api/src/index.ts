@@ -215,10 +215,15 @@ export async function handle(request: Request, env: Env): Promise<Response> {
       );
       return json({ ok: true });
     }
-    if (url.pathname === "/v1/auth/password" && request.method === "POST")
-      return json({
-        data: await credentialChange(env, s, await body(request)),
-      });
+    if (url.pathname === "/v1/auth/password" && request.method === "POST") {
+      const { _cookie, ...data } = await credentialChange(
+        env,
+        s,
+        await body(request),
+      );
+      if (_cookie) headers.append("Set-Cookie", _cookie);
+      return json({ data });
+    }
     if (
       url.pathname === "/v1/auth/reauthenticate" &&
       request.method === "POST"

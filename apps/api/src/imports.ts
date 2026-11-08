@@ -76,7 +76,11 @@ export async function importConfirm(input: unknown, env: Env, s: Session) {
     }[]
   >(env, "import_selection", p, s.accessToken);
   const outcomes = [];
-  for (const row of rows) {
+  // Bound provider/DB subrequests even on Workers Free. A workbook may contain
+  // 300 selected rows; callers resume explicitly using remainingRows.
+  const existing = rows.filter((row) => row.state === "existing");
+  const pending = rows.filter((row) => row.state !== "existing");
+  for (const row of [...existing, ...pending.slice(0, 5)]) {
     try {
       if (row.state === "existing") {
         outcomes.push({ row: row.row, state: "existing", id: row.studentId });
@@ -125,6 +129,8 @@ export async function importConfirm(input: unknown, env: Env, s: Session) {
     created: outcomes.filter((r) => r.state === "active").length,
     reused: outcomes.filter((r) => r.state === "existing").length,
     failed: outcomes.filter((r) => r.state === "failed").length,
+    remainingRows: pending.slice(5).map((row) => row.row),
+    complete: pending.length <= 5,
   };
 }
 export { rosterTemplate };

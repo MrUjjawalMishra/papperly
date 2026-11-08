@@ -19,3 +19,5 @@ Still requires configuration/decision before real-data operation:
 - Staging branch protection, environment secrets and CI enablement; no production promotion has been authorized.
 
 No credentials, API tokens, student answers, private query content, or reusable plaintext account passwords belong in audit logs, fixtures, commits or this document.
+
+2026-11-08 operational implementation decisions: staging identifiers/secrets/deployment are verified in release evidence; prior missing-configuration entries above are historical. Owner bootstrap is a restricted server-key CLI, never a public route. The database permits one active owner while retaining inactive historical owner membership IDs for append-only audit attribution. An explicit OWNER_USER_ID may pin login; otherwise the service-only adapter resolves the active singleton. Existing active owners are never reset or replaced by bootstrap retries. Synthetic acceptance deactivates its identities, revokes sessions, deletes Auth users and suspends schools while retaining tagged audit/exam fixtures. Public signup is disabled and email/password sign-in remains enabled, as verified against live Auth settings.

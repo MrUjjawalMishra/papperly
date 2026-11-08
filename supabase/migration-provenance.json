@@ -157,6 +157,13 @@
       "sha256": "0b48648a996812951054a9e4af672902de879e308d36f942e0832a8a91d54c6b",
       "providerVersion": "20261107142655",
       "canonicalFile": "20261107142655_papperly_202611070022_answer_validation.sql"
+    },
+    {
+      "file": "20261108045203_owner_lookup.sql",
+      "name": "papperly_owner_lookup",
+      "sha256": "2cb985ae1006c86f092e3a5268f000424ebb6ee8bb19f5e46d89f49e947d9c19",
+      "providerVersion": "20261108050823",
+      "canonicalFile": "20261108050823_papperly_owner_lookup.sql"
     }
   ]
 }

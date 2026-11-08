@@ -17,6 +17,7 @@ const env = {
   JOBS: {},
 } as Env;
 const testPassword = "Synthetic" + crypto.randomUUID().replaceAll("-", "");
+let providerPassword = testPassword.toLowerCase();
 const request = (
   path: string,
   p?: unknown,
@@ -52,13 +53,20 @@ beforeAll(async () => {
         ? (JSON.parse(String(init.body)) as Record<string, unknown>)
         : {};
       if (url.pathname === "/auth/v1/token") {
-        if (p.password !== testPassword.toLowerCase())
+        if (p.password !== providerPassword)
           return Response.json({ message: "invalid" }, { status: 400 });
         return Response.json({
           access_token: ids.student,
           refresh_token: "test-only",
           expires_at: Date.now() / 1000 + 3600,
         });
+      }
+      if (
+        url.pathname === `/auth/v1/admin/users/${ids.student}` &&
+        init?.method === "PUT"
+      ) {
+        providerPassword = String(p.password);
+        return Response.json({ id: ids.student });
       }
       if (url.pathname.startsWith("/rest/v1/rpc/")) {
         const name = url.pathname.split("/").pop()!;
@@ -167,4 +175,48 @@ it("logs in via student-only canonicalization, persists secure sessions, rejects
   expect(
     (await handle(request("/v1/auth/session", undefined, cookie), env)).status,
   ).toBe(401);
+});
+it("self password change sets a fresh HttpOnly cookie, hides internal cookie data and invalidates the old session", async () => {
+  const logged = await handle(
+    request("/v1/auth/login", {
+      schoolCode: "oak",
+      loginId: "student.9b15",
+      password: testPassword,
+    }),
+    env,
+  );
+  const originalCookie = logged.headers.get("Set-Cookie")!.split(";")[0];
+  const { csrfToken } = (await logged.json()) as { csrfToken: string };
+  const changed = await handle(
+    request(
+      "/v1/auth/password",
+      {
+        userId: ids.student,
+        currentPassword: testPassword,
+        newPassword: "Changed" + crypto.randomUUID().replaceAll("-", ""),
+        reason: "Synthetic self change",
+      },
+      originalCookie,
+      csrfToken,
+    ),
+    env,
+  );
+  expect(changed.status).toBe(200);
+  const cookieHeader = changed.headers.get("Set-Cookie")!;
+  expect(cookieHeader).toContain("HttpOnly");
+  const newCookie = cookieHeader.split(";")[0];
+  expect(newCookie).not.toBe(originalCookie);
+  const payload = (await changed.json()) as {
+    data: { csrfToken: string; _cookie?: string };
+  };
+  expect(payload.data._cookie).toBeUndefined();
+  expect(payload.data.csrfToken).not.toBe(csrfToken);
+  expect(
+    (await handle(request("/v1/auth/session", undefined, originalCookie), env))
+      .status,
+  ).toBe(401);
+  expect(
+    (await handle(request("/v1/auth/session", undefined, newCookie), env))
+      .status,
+  ).toBe(200);
 });
