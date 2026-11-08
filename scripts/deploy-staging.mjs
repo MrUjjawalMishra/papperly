@@ -13,6 +13,35 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { Buffer } from "node:buffer";
+
+export function serverKeyMetadata(value, projectRef) {
+  const key = value?.trim() ?? "";
+  if (key.startsWith("sb_secret_"))
+    return {
+      kind: "secret",
+      formatValid: /^sb_secret_[A-Za-z0-9_-]+$/.test(key),
+    };
+  if (key.startsWith("sb_publishable_"))
+    return { kind: "publishable-not-server", formatValid: false };
+  try {
+    const parts = key.split(".");
+    if (parts.length !== 3) throw Error("invalid JWT");
+    const claims = JSON.parse(
+      Buffer.from(parts[1], "base64url").toString("utf8"),
+    );
+    return {
+      kind: "legacy-jwt",
+      formatValid: true,
+      roleMatches: claims.role === "service_role",
+      projectMatches: claims.ref === projectRef,
+      expired:
+        typeof claims.exp === "number" && claims.exp * 1000 <= Date.now(),
+    };
+  } catch {
+    return { kind: "unrecognized", formatValid: false };
+  }
+}
 
 export function migrationDigest(directory = "supabase/migrations") {
   const h = createHash("sha256");
@@ -160,7 +189,10 @@ async function main() {
   const target = JSON.parse(
     readFileSync("docs/staging-release-target.json", "utf8"),
   );
-  const env = process.env;
+  const env = {
+    ...process.env,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
+  };
   validateTarget(target, env);
   const report = {
     environment: "staging",
@@ -192,6 +224,26 @@ async function main() {
     const subdomain = await api("/workers/subdomain");
     if (subdomain.result?.subdomain !== target.workersSubdomain)
       throw Error("Workers subdomain mismatch");
+    report.serverKeyMetadata = serverKeyMetadata(
+      env.SUPABASE_SERVICE_ROLE_KEY,
+      "soudjtewvquywncqtwyo",
+    );
+    console.log(
+      "Supabase key metadata (not authentication evidence):",
+      JSON.stringify(report.serverKeyMetadata),
+    );
+    // These independently authorized private resources do not use the Supabase key.
+    report.resources = await provisionPrivateResources(api, target);
+    save();
+    if (
+      !report.serverKeyMetadata.formatValid ||
+      report.serverKeyMetadata.roleMatches === false ||
+      report.serverKeyMetadata.projectMatches === false ||
+      report.serverKeyMetadata.expired === true
+    )
+      throw Error(
+        "Saved Supabase server key has the wrong format, role, project or expiry; replace only that secret in GitHub environment Cloudflare",
+      );
     const server = await fetch(
       target.supabaseUrl + "/rest/v1/rpc/runtime_rate",
       {
@@ -210,10 +262,17 @@ async function main() {
         signal: AbortSignal.timeout(20000),
       },
     );
-    if (!server.ok)
+    if (!server.ok) {
+      const rejection = await server.json().catch(() => null);
+      report.supabaseRejection = {
+        httpStatus: server.status,
+        invalidApiKey: rejection?.message === "Invalid API key",
+        expiredJwt: rejection?.code === "PGRST301",
+      };
       throw Error(
         `Supabase staging service-key check failed (HTTP ${server.status})`,
       );
+    }
     report.supabaseServiceKeyVerified = true;
     const subscription = await api("/subscriptions").catch(() => null);
     report.billing = {
@@ -246,8 +305,6 @@ async function main() {
       report.previousDeploymentId =
         deployments.result?.deployments?.[0]?.id ?? null;
     }
-    report.resources = await provisionPrivateResources(api, target);
-    save();
     const secrets = {
       SUPABASE_SERVICE_ROLE_KEY: env.SUPABASE_SERVICE_ROLE_KEY,
     };

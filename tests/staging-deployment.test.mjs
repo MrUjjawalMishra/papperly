@@ -3,7 +3,9 @@ import {
   cloudflareClient,
   provisionPrivateResources,
   validateTarget,
+  serverKeyMetadata,
 } from "../scripts/deploy-staging.mjs";
+import { Buffer } from "node:buffer";
 import { readFileSync } from "node:fs";
 const target = JSON.parse(
   readFileSync("docs/staging-release-target.json", "utf8"),
@@ -15,6 +17,30 @@ const env = {
   CLOUDFLARE_API_TOKEN: crypto.randomUUID(),
   SUPABASE_SERVICE_ROLE_KEY: crypto.randomUUID(),
 };
+it("reports only key-type and role/project/expiry checks without disclosing credentials", () => {
+  const jwt = (claims) =>
+    [
+      "synthetic",
+      Buffer.from(JSON.stringify(claims)).toString("base64url"),
+      "synthetic",
+    ].join(".");
+  const value = jwt({ role: "service_role", ref: "expected", exp: 1 });
+  expect(serverKeyMetadata(value, "expected")).toEqual({
+    kind: "legacy-jwt",
+    formatValid: true,
+    roleMatches: true,
+    projectMatches: true,
+    expired: true,
+  });
+  expect(
+    serverKeyMetadata(jwt({ role: "anon", ref: "other" }), "expected")
+      .roleMatches,
+  ).toBe(false);
+  expect(serverKeyMetadata("not-a-key", "expected").formatValid).toBe(false);
+  expect(JSON.stringify(serverKeyMetadata(value, "expected"))).not.toContain(
+    value,
+  );
+});
 it("rejects another account, repository, missing server key and unreviewed migrations before provisioning", () => {
   expect(() => validateTarget(target, env)).not.toThrow();
   for (const changed of [
