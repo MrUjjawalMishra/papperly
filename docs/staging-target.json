@@ -8,5 +8,9 @@
   "supabaseApiUrl": "https://soudjtewvquywncqtwyo.supabase.co",
   "githubCredentialEnvironment": "Cloudflare",
   "githubCredentialEnvironmentId": 26576187709,
-  "cloudflareReadAccessVerified": true
+  "cloudflareReadAccessVerified": true,
+  "cloudflareBucket": "papperly-staging-private",
+  "cloudflareQueue": "papperly-staging-jobs",
+  "cloudflareQueueId": "f80c4cea111642e9aa2e0794d3854f2c",
+  "cloudflarePrivateResourcesVerified": true
 }

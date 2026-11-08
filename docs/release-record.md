@@ -1,4 +1,4 @@
-# Current staging database release record — 2026-11-07
+# Current staging database release record — 2026-11-08
 
 Papperly's database schema is applied to the user-confirmed Supabase staging project. The Cloudflare application is not deployed, and full Version 1 acceptance remains incomplete.
 
@@ -14,10 +14,10 @@ Papperly's database schema is applied to the user-confirmed Supabase staging pro
 | RLS coverage                            | 60 application tables; RLS enabled on all 60                                                                                                                                             |
 | Native SQL checks                       | 21 assertions passed using authenticated/anon database roles and transaction-local claims; all synthetic data rolled back                                                                |
 | Data API checks                         | Four passed: public directory 200, anonymous results 401, service dispatcher 401, private schema 406                                                                                     |
-| Local regression                        | 29 tests/eight suites; lint, TypeScript, formatting, frontend-absence and Worker dry-run build passed                                                                                    |
+| Local regression                        | 40 tests/ten suites in GitHub CI; lint, TypeScript, formatting, frontend-absence and Worker dry-run build passed                                                                         |
 | Git repository / branch                 | MrUjjawalMishra/papperly / feat/backend-v1; bootstrap push succeeded at 1137da3962b2aee4a2f038dcdbc6b0512437e07f; CI run 42385021596 completed successfully and was verified through MCP |
 | Cloudflare release URL / deployment ID  | None                                                                                                                                                                                     |
-| Automatic CI deployment                 | Workflow source prepared; not enabled, triggered or verified                                                                                                                             |
+| Automatic CI deployment                 | Application-only staging route triggered; validation passed; deployment blocked by wrong Supabase key type                                                                               |
 | Previous known-good application release | None                                                                                                                                                                                     |
 
 Evidence: supabase-staging-evidence.json, supabase-http-smoke.json, supabase/migration-provenance.json and tests/live/rls-checks.sql. Database TypeScript types were generated from the live schema. The private schema remains outside the exposed Data API schemas. No real users, reusable credentials or student records were provisioned.
@@ -31,3 +31,7 @@ Remaining external blockers: verified Cloudflare account/Worker bindings and sco
 Recovery: do not rerun the original migration filenames or reset the project. The canonical migration versions now match Supabase history. Future schema changes use additive migrations/forward fixes. There is no application release to roll back. Backup/restore rehearsal, live Auth/Worker sessions, private R2/Queue/cron/scanner behavior, and the 50-examinee mixed-load target remain unverified. Full implementation gaps remain in backend-requirements.md. Earlier local-only records are retained under docs/history.
 
 GitHub CI evidence: https://github.com/MrUjjawalMishra/papperly/actions/runs/42385021596 — completed/success. Cloudflare release URL/ID remain absent. The current GitHub verification record is docs/github-verification.json.
+
+## Authorized Cloudflare provisioning attempt
+
+Source a6e9f2a38a13a001fd9bd0eb02624bae03cac863; run https://github.com/MrUjjawalMishra/papperly/actions/runs/42444357894. Validation passed all 40 tests and all required gates. Private bucket papperly-staging-private and Queue papperly-staging-jobs were created in the verified account; private domain settings checked. No Worker, release URL or deployment ID exists. SUPABASE_SERVICE_ROLE_KEY is present but contains a publishable key; the earlier request returned HTTP 401. Replace that environment secret before retrying the failed deploy job. This is not a live backend release or full integration acceptance. See staging-provisioning-evidence.json for exact resource IDs and artifact provenance. No account plan upgrade or production mutation was performed.

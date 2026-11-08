@@ -7,14 +7,15 @@
   "verificationRoute": "GitHub MCP repository/ref/workflow inspection",
   "metadataUpdateRoute": "GitHub MCP tree/commit/ref operations",
   "ci": {
-    "id": 42385021596,
-    "sha": "1137da3962b2aee4a2f038dcdbc6b0512437e07f",
+    "id": 42444347457,
+    "sha": "a6e9f2a38a13a001fd9bd0eb02624bae03cac863",
     "status": "completed",
     "conclusion": "success",
-    "url": "https://github.com/MrUjjawalMishra/papperly/actions/runs/42385021596"
+    "url": "https://github.com/MrUjjawalMishra/papperly/actions/runs/42444347457"
   },
   "defaultBranch": "feat/backend-v1",
   "defaultBranchNote": "GitHub selected the first pushed branch automatically; no main/staging merge occurred",
   "cloudflareDeployment": null,
-  "stagingDeploymentWorkflow": "Prepared, not enabled or tested"
+  "stagingDeploymentWorkflow": "ops/staging-deploy push route configured and attempted; gates passed; blocked on incorrect Supabase server-key type",
+  "stagingProvisioningRun": 42444357894
 }

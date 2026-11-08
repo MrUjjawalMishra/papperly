@@ -1,0 +1,35 @@
+{
+  "environment": "staging",
+  "accountId": "e746f9041a0f5eddfd51c206531b3393",
+  "commit": "a6e9f2a38a13a001fd9bd0eb02624bae03cac863",
+  "migrationVersion": "20261107142655",
+  "migrationDigest": "674350292d48afb93710d6426f1e7fd8cd4bd44703bf7b06c486ec15001a008d",
+  "startedAt": "2026-11-08T03:51:17.677Z",
+  "deployed": false,
+  "serverKeyMetadata": {
+    "kind": "publishable-not-server",
+    "formatValid": false
+  },
+  "resources": {
+    "bucket": "papperly-staging-private",
+    "bucketCreated": true,
+    "privateAccessVerified": true,
+    "queue": "papperly-staging-jobs",
+    "queueId": "f80c4cea111642e9aa2e0794d3854f2c",
+    "queueCreated": true
+  },
+  "error": "Saved Supabase server key has the wrong format, role, project or expiry; replace only that secret in GitHub environment Cloudflare",
+  "runId": 42444357894,
+  "runUrl": "https://github.com/MrUjjawalMishra/papperly/actions/runs/42444357894",
+  "artifactId": 13602647815,
+  "artifactDigest": "sha256:701e984b5437d6e252c82ff8969dae3553a851c4fdda160206daeb23426fc883",
+  "verificationRoute": "GitHub MCP orchestration/status/artifact; GitHub Actions Cloudflare REST",
+  "workerCreated": false,
+  "paidPlanUpgradePerformed": false,
+  "validation": {
+    "conclusion": "success",
+    "tests": 40,
+    "suites": 10
+  },
+  "frontend": "README placeholder only"
+}
