@@ -1,0 +1,20 @@
+{
+  "environment": "staging",
+  "releaseSha": "a6e9f2a38a13a001fd9bd0eb02624bae03cac863",
+  "project": "soudjtewvquywncqtwyo",
+  "worker": "papperly-api-staging",
+  "outboxId": "b168b1ea-e3f1-4549-aad8-818924c2030e",
+  "createdAt": "2026-11-08T04:28:45.8301Z",
+  "observedDispatchedAt": "2026-11-08T04:32:53.750215Z",
+  "observedTerminalAt": "2026-11-08T04:33:59.367654Z",
+  "status": "unavailable",
+  "errorCode": "AI_NOT_CONFIGURED",
+  "attempts": 1,
+  "insightStatus": "unavailable",
+  "noFakeGuidance": true,
+  "dispatchTriggeredManually": false,
+  "verification": "Synthetic pending outbox inserted transactionally through Supabase MCP; observed scheduled dispatch and real Queue claim/finish through database state. No manual dispatch or claim RPC called.",
+  "expectedOutcome": "Unconfigured AI fails closed; this is not live AI provider verification.",
+  "cleanup": "All probe schools, memberships, registry, insight and outbox rows deleted by exact synthetic IDs; post-cleanup counts checked. No Auth account created.",
+  "limitations": "One synthetic unconfigured-AI job; not redelivery, load, complete exam workflow or successful external AI/scanner integration."
+}

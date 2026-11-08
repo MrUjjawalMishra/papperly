@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-11-08T04:36:30.044263+00:00",
+  "url": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
+  "route": "Independent HTTPS requests from managed environment with a browser User-Agent; Python default User-Agent returned Cloudflare 1010 before reaching app",
+  "checks": [
+    {
+      "path": "/healthz",
+      "status": 200,
+      "release": "1466e58468fc335516f6aa3bf70dddf213c22e44",
+      "state": "ok"
+    },
+    {
+      "path": "/readyz",
+      "status": 200,
+      "release": "1466e58468fc335516f6aa3bf70dddf213c22e44",
+      "state": "ready"
+    },
+    {
+      "path": "/v1/results",
+      "status": 401
+    },
+    {
+      "path": "/v1/public/directory",
+      "status": 200
+    },
+    {
+      "path": "/v1/files/00000000-0000-4000-8000-000000000001",
+      "status": 401
+    },
+    {
+      "path": "/v1/groups",
+      "status": 401
+    },
+    {
+      "path": "/v1/queries",
+      "status": 401
+    },
+    {
+      "path": "/v1/reports/individual",
+      "status": 401
+    },
+    {
+      "path": "/v1/support/sessions",
+      "status": 401
+    }
+  ],
+  "limitations": "Anonymous boundaries and basic readiness; not an authenticated or cross-school live workflow."
+}

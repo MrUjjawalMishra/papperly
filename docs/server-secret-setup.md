@@ -1,4 +1,6 @@
-# Correct the staging Supabase server secret without a terminal
+# Historical server-secret correction — resolved
+
+Resolved on 2026-11-08: the server Secret key now verifies and staging is deployed. Do not replace the currently working key to repeat these historical steps. See staging-release-evidence.json.
 
 The Cloudflare environment already contains `SUPABASE_SERVICE_ROLE_KEY`, but run 42444357894 identified its value as a publishable key. The preceding server-only RPC returned HTTP 401. Do not change the working Cloudflare token/account ID, share keys in chat or recreate the bucket/Queue.
 
