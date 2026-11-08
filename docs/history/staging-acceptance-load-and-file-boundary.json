@@ -1,0 +1,184 @@
+{
+  "environment": "staging",
+  "base": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
+  "tag": "8da1b8c8",
+  "sourceCommit": "68f9caf5f643309f11aadde9abd4a084fe0f54c9",
+  "startedAt": "2026-11-08T08:53:01.103Z",
+  "checks": [
+    {
+      "name": "verified live release and public signup disabled",
+      "passed": true,
+      "durationMs": 1086
+    },
+    {
+      "name": "restricted synthetic owner bootstrap and fresh-session password change",
+      "passed": true,
+      "durationMs": 6418
+    },
+    {
+      "name": "owner provisions two schools, administrators and teachers",
+      "passed": true,
+      "durationMs": 24191
+    },
+    {
+      "name": "tenant isolation and unauthorized role escalation",
+      "passed": true,
+      "durationMs": 2709
+    },
+    {
+      "name": "50 synthetic students provisioned through the assigned teacher",
+      "passed": true,
+      "durationMs": 172037
+    },
+    {
+      "name": "concurrent Excel previews/imports reuse identities without password redisplay",
+      "passed": true,
+      "durationMs": 3519
+    },
+    {
+      "name": "immutable mixed-format 30-minute 25-mark paper and recipient snapshots",
+      "passed": true,
+      "durationMs": 6750
+    },
+    {
+      "name": "50-concurrent-student answer saves with real database connections",
+      "passed": true,
+      "durationMs": 27085
+    },
+    {
+      "name": "50 concurrent submissions, duplicate receipts and finalized-write denial",
+      "passed": true,
+      "durationMs": 2175
+    },
+    {
+      "name": "server objective scoring, teacher review and published-only progress",
+      "passed": true,
+      "durationMs": 5151
+    },
+    {
+      "name": "teacher-only group posts and membership revocation",
+      "passed": false
+    }
+  ],
+  "resources": {
+    "schools": [
+      "6e8453ff-edea-4592-b50d-c066a00f2b39",
+      "611df532-b0cf-4ef0-b7ee-984a9e7b8242"
+    ],
+    "users": [
+      "66d43c58-eccc-4c73-9a67-92fb605b977e",
+      "91f5f4ec-61aa-4173-9241-05c3aafa00c3",
+      "a4666dd8-8561-4a9b-adc1-c4b81be911ca",
+      "d764c1c1-2539-47b8-a8c9-8946684a205b",
+      "78fa7a78-62cd-4a67-83a7-16deb985f32c",
+      "3182767f-9933-40b2-95ff-9e33659a2e8c",
+      "3b9d6dac-3ff8-46d8-a4d7-44542512266a",
+      "cb698721-91d3-41e1-8716-98d2e1fb6d1d",
+      "069a57d9-2778-4207-b561-7c11ac2a6768",
+      "6b769e72-6f63-4b79-856e-7bfe6085c666",
+      "e17de306-b4f0-4bef-8f27-fbaa0af5dd05",
+      "a7acd36b-4cff-4050-b1e7-18baf77026d8",
+      "9f6003a6-e846-4c28-ad85-3e0623ba2db9",
+      "3243fbd6-0158-4569-b3cc-67297587f406",
+      "53125c78-cc87-4159-82fd-58ef87a4cda1",
+      "a868d2d5-c0fd-4b60-90ea-442ecfd15501",
+      "cc887410-f31b-4c78-8306-e84a56135f62",
+      "3e265cae-c7ba-44ca-9ceb-aa816eec1761",
+      "631fb5c5-f5da-4545-a906-b9513b3006d5",
+      "e44f2f9c-a1c2-4956-ae47-4e8bcbc39579",
+      "bb11d1e1-ffd1-4a7f-9b9c-b9ee37768a55",
+      "4eb8c18f-d6d3-4e76-8a9e-0055000a8418",
+      "2cea794c-6dfd-41c0-a420-9ea637bfb0ec",
+      "9bb19ed0-a7a3-402b-8369-5522e15bb699",
+      "552897e4-0bd3-4ff8-98c3-6e78b60c916c",
+      "8380131e-e1cc-4ad5-8969-cf30f65a219a",
+      "1f2d9c40-eccd-45a5-b817-32980a051bb9",
+      "ee7a0d7e-1a96-4f49-b10e-b962148d60b4",
+      "05877277-f21c-467f-aa18-8b2b5abcf4df",
+      "07893b2a-af5d-48f9-8468-1f6242682198",
+      "52a4d9a7-6d06-45e0-9e54-9f541d5e2c8c",
+      "5c3fb068-16cf-46f3-bf61-7c771e20679d",
+      "384e282b-63fd-4a8d-990a-15bc2dcd827d",
+      "0585b9c5-7f86-43db-a2fe-f53e944445a3",
+      "733c3c48-96aa-41f5-8573-a2c0a5dd3677",
+      "2a99639f-bbca-41f7-9a4a-d4a4d3504cae",
+      "07afcaae-b6c1-47d8-975d-fd93215c294c",
+      "1e6e6501-1da9-4d42-a462-42322274adeb",
+      "9daea647-7624-4f30-8498-5ed752e69358",
+      "d0c6bbf4-ecad-4768-8246-011357f2b70a",
+      "3353b13c-40ce-40ef-af34-9536c7224c7e",
+      "3d951197-5d0a-44f2-8b9c-812150fef799",
+      "794ec00e-4c86-4a51-bfdd-1775cdf87d27",
+      "8c47b4bf-b001-494c-b500-09e97d98fc75",
+      "7cac3deb-8756-42f9-8dbb-26476c1bf268",
+      "fd127f88-6b75-419e-8195-9b3782aa184d",
+      "50e535a8-01eb-4d07-b77a-fdaf0b9c97fe",
+      "6975087f-497a-49b1-9ccb-20fadba1bab9",
+      "3f44b16f-9fcc-42a5-a16c-3419d6072a8f",
+      "649271a9-679c-428c-809c-455c30243baf",
+      "621b1ae1-dc3d-419c-b8cf-0ec0973e8d50",
+      "315367eb-c9f4-4c4f-ac6e-aa78bd83abb9",
+      "21f02c89-4210-4d62-b828-b1411bbae6f4",
+      "44a648d2-abc5-4705-9e70-ba451185a317",
+      "26148d8b-a5d4-4486-bc27-34d7e9e373ac",
+      "4f1e2a3c-de91-4572-99f2-e53f1520756a",
+      "af134a08-7195-4ccb-a07b-a64c01eba911"
+    ],
+    "attachmentId": "2412cb6f-cdc4-437c-8370-3d4368e91b2f"
+  },
+  "passed": false,
+  "cleanup": {
+    "authUsersRemoved": true,
+    "membershipsDeactivated": true,
+    "schoolsSuspended": true,
+    "syntheticAuditAndExamEvidenceRetained": true
+  },
+  "deployedRelease": "68f9caf5f643309f11aadde9abd4a084fe0f54c9",
+  "publicSignupDisabled": true,
+  "authSetup": {
+    "paced": true,
+    "minimumDelayMs": 2200,
+    "reason": "Provider token endpoint has a documented 30-request burst bucket; the 50-user answer/save benchmark starts only after sessions exist."
+  },
+  "backgroundWarmup": {
+    "versionId": "0c256fda-5972-4f8e-afa2-ab0e2fb6cb44",
+    "attempts": 50,
+    "expectedJobs": 100,
+    "processingObservedBeforeMeasuredSaves": true,
+    "statesBeforeMeasuredSaves": {
+      "pending": 0,
+      "dispatched": 99,
+      "processing": 1,
+      "done": 0,
+      "unavailable": 0,
+      "failed": 0
+    }
+  },
+  "load": {
+    "environment": "GitHub-hosted Ubuntu runner \u2192 Cloudflare Worker \u2192 Supabase ap-northeast-1, real Auth/RLS/Queues",
+    "concurrency": 50,
+    "aiCompletionExcluded": true,
+    "answerSave": {
+      "requests": 50,
+      "failures": 0,
+      "p95Ms": 1032.73,
+      "maxMs": 1053,
+      "targetMs": 2000
+    },
+    "submission": {
+      "requests": 50,
+      "failures": 0,
+      "p95Ms": 1007.17,
+      "maxMs": 1075,
+      "targetMs": 2000
+    },
+    "background": {
+      "subjectiveJobsExpected": 100,
+      "providerConfigured": false
+    },
+    "targetPassed": true
+  },
+  "error": "/v1/files/2412cb6f-cdc4-437c-8370-3d4368e91b2f: expected 403, received 404; code FILE_UNAVAILABLE",
+  "completedAt": "2026-11-08T08:58:02.575Z",
+  "limitations": "Synthetic staging workflow only. Provider AI/scanning unavailable, uploads stay quarantined. Audit and synthetic exam rows retained with inactive identities. Native load target is measured, not assumed passed; PDF/restore/retention and exhaustive FR matrix remain separate."
+}

@@ -846,8 +846,17 @@ try {
     ).data.data;
     ensure(upload.state === "quarantined", "Unscanned upload marked clean");
     report.resources.attachmentId = upload.id;
-    await students[0].request(`/v1/files/${upload.id}`, undefined, 403);
-    await b.student.request(`/v1/files/${upload.id}`, undefined, 403);
+    for (const requester of [students[0], b.student]) {
+      const denied = await requester.request(
+        `/v1/files/${upload.id}`,
+        undefined,
+        404,
+      );
+      ensure(
+        denied.data.error?.code === "FILE_UNAVAILABLE",
+        "Private file denial leaked content or used an unexpected boundary",
+      );
+    }
     await a.teacher.call("groups/members", {
       groupId,
       studentId: students[0].userId,
