@@ -1,0 +1,209 @@
+{
+  "environment": "staging",
+  "base": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
+  "tag": "0fa8ebbd",
+  "sourceCommit": "af443c72454c4fd033a136d5054f068306c451fd",
+  "startedAt": "2026-11-08T09:02:37.622Z",
+  "checks": [
+    {
+      "name": "verified live release and public signup disabled",
+      "passed": true,
+      "durationMs": 569
+    },
+    {
+      "name": "restricted synthetic owner bootstrap and fresh-session password change",
+      "passed": true,
+      "durationMs": 5717
+    },
+    {
+      "name": "owner provisions two schools, administrators and teachers",
+      "passed": true,
+      "durationMs": 24836
+    },
+    {
+      "name": "tenant isolation and unauthorized role escalation",
+      "passed": true,
+      "durationMs": 2849
+    },
+    {
+      "name": "50 synthetic students provisioned through the assigned teacher",
+      "passed": true,
+      "durationMs": 179596
+    },
+    {
+      "name": "concurrent Excel previews/imports reuse identities without password redisplay",
+      "passed": true,
+      "durationMs": 3803
+    },
+    {
+      "name": "immutable mixed-format 30-minute 25-mark paper and recipient snapshots",
+      "passed": true,
+      "durationMs": 7401
+    },
+    {
+      "name": "50-concurrent-student answer saves with real database connections",
+      "passed": true,
+      "durationMs": 43352
+    },
+    {
+      "name": "50 concurrent submissions, duplicate receipts and finalized-write denial",
+      "passed": true,
+      "durationMs": 1971
+    },
+    {
+      "name": "server objective scoring, teacher review and published-only progress",
+      "passed": true,
+      "durationMs": 5041
+    },
+    {
+      "name": "teacher-only group posts and membership revocation",
+      "passed": true,
+      "durationMs": 6488
+    },
+    {
+      "name": "private query deadlines, extensions, replies and reopen cycles",
+      "passed": true,
+      "durationMs": 6724
+    },
+    {
+      "name": "login-ID changes and attributed staff reset invalidate old sessions",
+      "passed": true,
+      "durationMs": 9286
+    },
+    {
+      "name": "private R2 report export through actual scheduled Queue processing",
+      "passed": true,
+      "durationMs": 86446
+    }
+  ],
+  "resources": {
+    "schools": [
+      "41c049c3-68b8-42c8-86ac-2e24822dec8f",
+      "ff6d65e9-4ed1-4789-b770-1fa6c1e13af6"
+    ],
+    "users": [
+      "9d72fe8d-1725-48ee-b2f1-01a105b9e208",
+      "58da445e-cf36-4c55-be44-6098aa694d84",
+      "cd0962b7-8e16-4801-9192-207a9a2138a7",
+      "cf1f6c48-e363-4684-b7eb-e325b7144214",
+      "a74fc688-bd77-4525-b813-a3982c00c1dd",
+      "b0a4f014-da3b-4afa-8194-c1fd181627ce",
+      "ec213a5f-bd91-4e96-94cc-7130613b01f1",
+      "9963d8d9-20ba-4505-8ebd-da3ac8ae8d91",
+      "51bef042-d91a-48db-88c3-47f4b5e37edb",
+      "14d2b712-92d9-4ae2-853a-0d2f37ac1620",
+      "7e8bc97e-39b8-4838-b773-c6e0f62e243d",
+      "24881575-a76a-4076-b27d-d543668b6025",
+      "9f2315d5-94b3-45dc-a551-e0bcbc6c2d0e",
+      "131d646e-5028-4969-bf61-b16ff82755be",
+      "683bc246-3c53-495e-bdc7-17f4bf9ae9bf",
+      "65b9066a-ed89-4112-856f-56d82e194286",
+      "650e5587-3808-4d7f-bcda-e129e8d237c6",
+      "7b9dc57a-d409-4128-93be-a64695d7d044",
+      "9e84ada8-afaa-4a0a-b4dd-7bf29bdd16b8",
+      "dd7b6b21-3f00-4df3-84d5-6f5718f32f9a",
+      "30019731-f64a-425c-9454-062a583261a9",
+      "5374cc3f-4215-4acb-81f9-3fae4a48f682",
+      "65185f9f-67a5-4aaf-8da9-098fe2428ce1",
+      "11286c6d-92e1-4e60-ad07-1ff646612ff0",
+      "ea283371-e808-4171-b59c-7b60d86d9bf1",
+      "701fafe1-e66a-402c-a9b3-7380e70a33d4",
+      "c02f4144-b954-4c25-9cda-c44690d6de55",
+      "20ac0bdb-3a34-44fe-ab85-6c5623757f0a",
+      "b4bbff44-b411-48b8-8d0e-8cac82959f25",
+      "b6d62eba-3a96-4a26-bd6e-3c5e24fd3020",
+      "ab4f81ec-9265-4560-a5db-e2faffb7abb3",
+      "202eeaec-4011-491d-a7a6-564e6e98f6fc",
+      "cc90c7af-2616-4944-be5e-371c09c5b8d9",
+      "5c938b64-3b0a-4fd7-8e5c-8ee317ebaf84",
+      "a4107e84-cf41-4a75-9d88-8ab4b835c766",
+      "11edf22c-c804-4d82-9c28-f3264c6065f0",
+      "0933d651-0e2c-4d99-a11f-da59ddf14132",
+      "ad6995b5-cce5-4910-b0e8-270ba35a48bf",
+      "ee6d4eea-88d2-4db7-b6c5-1585b49a191e",
+      "3b3d9d91-226b-4327-b097-779619bd8a6d",
+      "9a76f096-432e-40ef-93e9-61ffcfd77cf1",
+      "22218a2a-ec08-4d60-8bf7-fb4cffed87a6",
+      "6340f77a-318c-42d6-9371-b48b7f8ada09",
+      "8534ffae-54e4-477f-b768-12a39d08cbae",
+      "dcfec71b-17da-41a6-97a8-16af52841ac1",
+      "4cdb176d-c389-43d0-8aef-b2de23cd0127",
+      "9f4c5aa4-0fff-4e16-9576-08f2737bf670",
+      "6fa3ff30-4aa0-4fa1-be4f-639de752e4b7",
+      "51e9da0b-ca86-4164-ade5-1f3ea75c007e",
+      "289c2497-a25e-43f1-ba17-411a7c7c069b",
+      "f5bd9395-0bc0-4ada-b09f-9138d0934504",
+      "010f8c52-5f7e-402b-b421-1776c8103ee8",
+      "7c27924e-e039-43e2-86bd-879bd738dc90",
+      "be487c24-55a6-4d28-bc64-d8d147370a1a",
+      "27ac9b5a-c300-4a07-a77c-e528cead2d19",
+      "39f57d37-6297-4bab-b7bf-c382e37f667b",
+      "a723bc17-17be-4af5-a0dd-074fddd1253e"
+    ],
+    "attachmentId": "9acb37ad-ec8c-4dd8-bc5f-31f7db71709c",
+    "exportId": "afeddc3b-f5b8-4944-9c15-c9482430fddd"
+  },
+  "passed": true,
+  "cleanup": {
+    "authUsersRemoved": true,
+    "membershipsDeactivated": true,
+    "schoolsSuspended": true,
+    "syntheticAuditAndExamEvidenceRetained": true,
+    "inactiveOrdinaryJwtDenied": true
+  },
+  "deployedRelease": "af443c72454c4fd033a136d5054f068306c451fd",
+  "publicSignupDisabled": true,
+  "authSetup": {
+    "paced": true,
+    "minimumDelayMs": 2200,
+    "reason": "Provider token endpoint has a documented 30-request burst bucket; the 50-user answer/save benchmark starts only after sessions exist."
+  },
+  "backgroundWarmup": {
+    "versionId": "b9ff5874-d294-4b90-9451-0f8a9eaeee3b",
+    "attempts": 50,
+    "expectedJobs": 100,
+    "processingObservedBeforeMeasuredSaves": true,
+    "statesBeforeMeasuredSaves": {
+      "pending": 0,
+      "dispatched": 99,
+      "processing": 1,
+      "done": 0,
+      "unavailable": 0,
+      "failed": 0
+    }
+  },
+  "load": {
+    "environment": "GitHub-hosted Ubuntu runner \u2192 Cloudflare Worker \u2192 Supabase ap-northeast-1, real Auth/RLS/Queues",
+    "concurrency": 50,
+    "aiCompletionExcluded": true,
+    "answerSave": {
+      "requests": 50,
+      "failures": 0,
+      "p95Ms": 1382.02,
+      "maxMs": 1446,
+      "targetMs": 2000
+    },
+    "submission": {
+      "requests": 50,
+      "failures": 0,
+      "p95Ms": 928.92,
+      "maxMs": 960,
+      "targetMs": 2000
+    },
+    "background": {
+      "subjectiveJobsExpected": 100,
+      "providerConfigured": false
+    },
+    "targetPassed": true
+  },
+  "completedAt": "2026-11-08T09:09:47.503Z",
+  "limitations": "Synthetic staging workflow only. Provider AI/scanning unavailable, uploads stay quarantined. Audit and synthetic exam rows retained with inactive identities. Native load target is measured, not assumed passed; PDF/restore/retention and exhaustive FR matrix remain separate.",
+  "workflowRun": 42465449065,
+  "artifactId": 13611581912,
+  "artifactDigest": "sha256:41daafdb07d9bad139bc9bbc567bb68f6e096a39b126afb6893db903645ceb39",
+  "independentCleanupVerification": {
+    "authUsers": 0,
+    "authSessions": 0,
+    "activeMemberships": 0
+  }
+}

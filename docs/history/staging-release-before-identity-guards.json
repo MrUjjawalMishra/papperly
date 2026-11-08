@@ -1,0 +1,51 @@
+{
+  "environment": "staging",
+  "accountId": "e746f9041a0f5eddfd51c206531b3393",
+  "commit": "1466e58468fc335516f6aa3bf70dddf213c22e44",
+  "migrationVersion": "20261107142655",
+  "migrationDigest": "674350292d48afb93710d6426f1e7fd8cd4bd44703bf7b06c486ec15001a008d",
+  "startedAt": "2026-11-08T04:34:37.342Z",
+  "deployed": true,
+  "serverKeyMetadata": {
+    "kind": "secret",
+    "formatValid": true
+  },
+  "resources": {
+    "bucket": "papperly-staging-private",
+    "bucketCreated": false,
+    "privateAccessVerified": true,
+    "queue": "papperly-staging-jobs",
+    "queueId": "f80c4cea111642e9aa2e0794d3854f2c",
+    "queueCreated": false
+  },
+  "supabaseServiceKeyVerified": true,
+  "billing": {
+    "planReadAvailable": false,
+    "upgradePerformed": false
+  },
+  "previousDeploymentId": "608bb699-5c9a-43e4-8ae8-ef07034bc5af",
+  "apiUrl": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
+  "deploymentId": "b657d5eb-74c6-4610-a3b5-c40c981f8758",
+  "bindingsVerified": true,
+  "scheduleConfigured": true,
+  "queueConsumerConfigured": true,
+  "basicSmokePassed": true,
+  "completedAt": "2026-11-08T04:34:46.473Z",
+  "limitations": "Basic release smoke only; full multi-role, scheduled/queue processing, file, external-provider and load/restore acceptance remains outstanding. No real student provisioning or frontend deployed.",
+  "runId": 42447317765,
+  "attempt": 1,
+  "runUrl": "https://github.com/MrUjjawalMishra/papperly/actions/runs/42447317765",
+  "workerVersionId": "7208ad7d-dfb7-41d5-9eae-cd1c9e3fef4a",
+  "artifactId": 13603819252,
+  "verificationRoute": "GitHub MCP commits/refs/workflow/status/logs; GitHub Actions Cloudflare REST/Wrangler; independent HTTPS checks",
+  "validation": {
+    "tests": 44,
+    "suites": 11,
+    "conclusion": "success"
+  },
+  "previousBasicSmokeVerifiedRelease": {
+    "sha": "a6e9f2a38a13a001fd9bd0eb02624bae03cac863",
+    "deploymentId": "608bb699-5c9a-43e4-8ae8-ef07034bc5af"
+  },
+  "backgroundEvidence": "staging-background-evidence.json: one real scheduled/Queue fail-closed job on previous application baseline; full background acceptance still outstanding"
+}
