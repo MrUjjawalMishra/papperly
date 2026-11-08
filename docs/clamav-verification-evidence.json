@@ -1,0 +1,46 @@
+{
+  "engineVersion": "ClamAV 1.5.4/28177/Sun Nov  8 06:23:52 2026",
+  "gateway": "authenticated localhost HTTP \u2192 actual ClamAV INSTREAM",
+  "persistentHostDeployed": false,
+  "checks": [
+    {
+      "name": "synthetic clean document",
+      "httpStatus": 200,
+      "expected": "clean",
+      "actual": "clean",
+      "passed": true
+    },
+    {
+      "name": "harmless EICAR antivirus test",
+      "httpStatus": 200,
+      "expected": "infected",
+      "actual": "infected",
+      "passed": true
+    },
+    {
+      "name": "archive with harmless EICAR test",
+      "httpStatus": 200,
+      "expected": "infected",
+      "actual": "infected",
+      "passed": true
+    },
+    {
+      "name": "archive within permitted expanded-file bounds",
+      "httpStatus": 200,
+      "expected": "clean",
+      "actual": "clean",
+      "passed": true
+    },
+    {
+      "name": "archive exceeding expanded-file scan limits",
+      "httpStatus": 503,
+      "expected": "unavailable",
+      "actual": "SCANNER_UNAVAILABLE",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "image": "clamav/clamav:1.5.4@sha256:6d87c712e3391e13c1ba6e05dfb074d4b1ddb5a6834b23bb9da990d2a4ef042a",
+  "dockerGatewayBuildPassed": true,
+  "limitations": "Local managed Docker and actual INSTREAM engine only; persistent staging host and end-to-end Worker/R2 integration remain unverified."
+}

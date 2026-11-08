@@ -331,6 +331,15 @@ async function main() {
     const secrets = {
       SUPABASE_SERVICE_ROLE_KEY: env.SUPABASE_SERVICE_ROLE_KEY,
     };
+    if (env.GEMINI_API_KEY?.trim()) {
+      secrets.GEMINI_API_KEY = env.GEMINI_API_KEY.trim();
+      sensitive.push(secrets.GEMINI_API_KEY);
+    }
+    if (env.SCANNER_API_KEY?.trim()) {
+      secrets.SCANNER_API_KEY = env.SCANNER_API_KEY.trim();
+      sensitive.push(secrets.SCANNER_API_KEY);
+    }
+
     const existingSecrets = previous
       ? (await api(`/workers/scripts/${target.worker}/secrets`)).result
       : [];
@@ -367,6 +376,14 @@ async function main() {
       `AUTH_ALIAS_DOMAIN:${target.authAliasDomain}`,
       "--var",
       `AUTH_IP_FORWARDING:${target.authIpForwardingEnabled === true ? "true" : "false"}`,
+      "--var",
+      `AI_PROVIDER:gemini-free`,
+      "--var",
+      `AI_MODEL:gemini-3.8-flash`,
+      "--var",
+      `GEMINI_FREE_TIER_CONFIRMED:${env.GEMINI_FREE_TIER_CONFIRMED === "true" && env.GEMINI_API_KEY?.trim() ? "true" : "false"}`,
+      "--var",
+      `SCANNER_ENDPOINT:${env.SCANNER_ENDPOINT?.startsWith("https://") && env.SCANNER_API_KEY?.trim() ? env.SCANNER_ENDPOINT : ""}`,
       "--message",
       `Papperly staging ${env.GITHUB_SHA}`,
     ];

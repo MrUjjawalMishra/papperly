@@ -1,0 +1,32 @@
+name: Synthetic free-tier Gemini integration verification
+on:
+  push:
+    branches: [ops/staging-ai-checks]
+permissions:
+  contents: read
+concurrency:
+  group: papperly-staging-release
+  cancel-in-progress: false
+jobs:
+  verify:
+    environment: Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: node --import tsx scripts/verify-gemini.ts
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_FREE_TIER_CONFIRMED: ${{ vars.GEMINI_FREE_TIER_CONFIRMED || secrets.GEMINI_FREE_TIER_CONFIRMED }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthetic-gemini-verification
+          path: work/gemini-verification.json
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,3 +1,4 @@
+import { geminiConfigured } from "./gemini";
 import { z, ZodError } from "zod";
 import { login, uuid } from "../../../packages/contracts/src/index";
 import {
@@ -110,8 +111,11 @@ export async function handle(request: Request, env: Env): Promise<Response> {
         status: "ready",
         environment: env.ENVIRONMENT,
         release: env.RELEASE_SHA ?? "local",
-        ai: env.AI_ENDPOINT ? "configured-unverified" : "unavailable",
-        scanning: "unavailable",
+        ai: geminiConfigured(env) ? "configured-unverified" : "unavailable",
+        scanning:
+          env.SCANNER_ENDPOINT?.startsWith("https://") && env.SCANNER_API_KEY
+            ? "configured-unverified"
+            : "unavailable",
       });
     }
     if (!url.pathname.startsWith("/v1/")) throw new ApiError(404, "NOT_FOUND");

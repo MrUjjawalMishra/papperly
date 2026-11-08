@@ -11,8 +11,9 @@ export interface Env {
   RELEASE_SHA?: string;
   SCANNER_ENDPOINT?: string;
   SCANNER_API_KEY?: string;
-  AI_ENDPOINT?: string;
-  AI_API_KEY?: string;
+  AI_PROVIDER?: "gemini-free";
+  GEMINI_API_KEY?: string;
+  GEMINI_FREE_TIER_CONFIRMED?: "true" | "false";
   AI_MODEL?: string;
   FILES: R2Bucket;
   JOBS: Queue<{ id: string; kind: string }>;

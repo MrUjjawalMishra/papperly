@@ -2181,6 +2181,7 @@ export type Database = {
       runtime_reauthenticated: { Args: { p: Json }; Returns: undefined };
       runtime_reconcile_upload: { Args: { p: Json }; Returns: undefined };
       runtime_reserve_ai: { Args: { p: Json }; Returns: boolean };
+      runtime_reserve_provider_call: { Args: { p: Json }; Returns: boolean };
       runtime_scan_finish: { Args: { p: Json }; Returns: undefined };
       runtime_session: { Args: { p: Json }; Returns: Json };
       runtime_session_create: { Args: { p: Json }; Returns: undefined };

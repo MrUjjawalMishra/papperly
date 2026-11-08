@@ -1,0 +1,28 @@
+services:
+  clamav:
+    image: clamav/clamav:1.5.4@sha256:6d87c712e3391e13c1ba6e05dfb074d4b1ddb5a6834b23bb9da990d2a4ef042a
+    restart: unless-stopped
+    mem_limit: 2g
+    cpus: 2
+    volumes:
+      - clamav-definitions:/var/lib/clamav
+      - ./clamd.conf:/etc/clamav/clamd.conf:ro
+    # No public daemon port. Its unauthenticated socket is private to this network.
+  gateway:
+    build: .
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 1
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      SCANNER_API_KEY: ${SCANNER_API_KEY:?Set the gateway secret through the host secret mechanism}
+      CLAMD_HOST: clamav
+      CLAMD_PORT: "3310"
+    ports: ["127.0.0.1:8080:8080"]
+    depends_on:
+      clamav:
+        condition: service_started
+volumes:
+  clamav-definitions:

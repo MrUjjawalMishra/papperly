@@ -15,8 +15,8 @@
     "format:check": "prettier --check .",
     "format": "prettier --write .",
     "verify": "npm run lint && npm run typecheck && npm run contracts:check && npm test && npm run check:frontend && npm run build",
-    "contracts:generate": "tsx scripts/generate-openapi.ts",
-    "contracts:check": "tsx scripts/generate-openapi.ts --check"
+    "contracts:generate": "tsx scripts/generate-openapi.ts && tsx scripts/generate-ai-schemas.ts",
+    "contracts:check": "tsx scripts/generate-openapi.ts --check && tsx scripts/generate-ai-schemas.ts --check"
   },
   "dependencies": {
     "fast-xml-parser": "^5.12.0",

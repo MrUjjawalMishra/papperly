@@ -185,6 +185,13 @@
       "sha256": "852c87ff5c259ea8d50a70d002c2180ef135e033af5c94d20882c69bb9a30b3c",
       "providerVersion": "20261108094456",
       "canonicalFile": "20261108094456_papperly_report_terms_and_metrics.sql"
+    },
+    {
+      "file": "20261108101256_gemini_free_quota.sql",
+      "name": "papperly_gemini_free_quota",
+      "sha256": "1e41549b2dd174354be50ca8dc796783b7fc5e7ecd4f94e997202693cae2d70d",
+      "providerVersion": "20261108101521",
+      "canonicalFile": "20261108101521_papperly_gemini_free_quota.sql"
     }
   ]
 }

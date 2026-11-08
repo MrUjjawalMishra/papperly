@@ -1,0 +1,28 @@
+name: Actual private ClamAV engine verification
+on:
+  push:
+    branches: [ops/staging-scanner-checks]
+permissions:
+  contents: read
+concurrency:
+  group: papperly-scanner-verification
+  cancel-in-progress: false
+jobs:
+  scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: bash scripts/verify-clamav-ci.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: actual-clamav-verification
+          path: work/clamav-verification.json
+          if-no-files-found: warn
+          retention-days: 14
