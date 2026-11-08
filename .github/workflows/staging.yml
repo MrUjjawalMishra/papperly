@@ -20,7 +20,7 @@ jobs:
       - run: npm run format:check
       - run: npm run verify
       - run: node scripts/scan-secrets.mjs
-      - run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 detect --source=/repo --no-git --redact --exit-code=1
+      - run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 detect --source=/repo --config=/repo/.gitleaks.toml --no-git --redact --exit-code=1
   deploy:
     needs: validate
     if: vars.ENABLE_STAGING_AUTODEPLOY == 'true'

@@ -1,0 +1,49 @@
+name: Provision and deploy authorized staging backend
+on:
+  push:
+    branches: [ops/staging-deploy]
+permissions:
+  contents: read
+concurrency:
+  group: papperly-staging-release
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run verify
+      - run: node scripts/scan-secrets.mjs
+      - run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 detect --source=/repo --config=/repo/.gitleaks.toml --no-git --redact --exit-code=1
+  deploy:
+    needs: validate
+    environment: Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Verify targets, provision private resources, deploy and check release
+        run: node scripts/deploy-staging.mjs
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          WRANGLER_SEND_METRICS: "false"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: staging-release-evidence
+          path: work/staging-release.json
+          retention-days: 14
+          if-no-files-found: warn

@@ -19,4 +19,4 @@ jobs:
       - run: npm run verify
       - run: node scripts/scan-secrets.mjs
       - name: Scan tracked source and history without credentials
-        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 detect --source=/repo --no-git --redact --exit-code=1
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 detect --source=/repo --config=/repo/.gitleaks.toml --no-git --redact --exit-code=1

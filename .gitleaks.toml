@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+# Supabase publishable keys are intentionally public client configuration.
+# Restrict this exception to this one complete JSON field; sb_secret/JWT keys
+# and all other fields/files remain scanned by the default rules.
+[allowlist]
+description = "Verified staging Supabase publishable configuration"
+regexTarget = "line"
+regexes = ['''^\s*"supabasePublishableKey": "sb_publishable_[A-Za-z0-9_-]+",\s*$''']
