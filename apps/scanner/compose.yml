@@ -1,12 +1,14 @@
 services:
   clamav:
     image: clamav/clamav:1.5.4@sha256:6d87c712e3391e13c1ba6e05dfb074d4b1ddb5a6834b23bb9da990d2a4ef042a
+    entrypoint: ["/bin/sh", "/papperly/start-clamav.sh"]
     restart: unless-stopped
     mem_limit: 2g
     cpus: 2
     volumes:
       - clamav-definitions:/var/lib/clamav
       - ./clamd.conf:/etc/clamav/clamd.conf:ro
+      - ./start-clamav.sh:/papperly/start-clamav.sh:ro
     # No public daemon port. Its unauthenticated socket is private to this network.
   gateway:
     build: .
