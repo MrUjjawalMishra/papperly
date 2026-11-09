@@ -4,6 +4,8 @@ import { format } from "prettier";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { operations, readTables, listFilters } from "../apps/api/src/routes";
 import { login, errorSchema } from "../packages/contracts/src/index";
+import { publishedArticle } from "../packages/contracts/src/publication";
+import { z } from "zod";
 import {
   accountInput,
   credentialChangeInput,
@@ -199,6 +201,21 @@ for (const [path, method, description] of [
     "get",
     "Approved public profile projection only.",
   ],
+  [
+    "/v1/public/articles/{id}",
+    "get",
+    "Approved article for its current audience; optional session for school access. BodyHtml uses restricted Markdown with raw HTML/images disabled. No-store; indexing requires explicit school policy.",
+  ],
+  [
+    "/v1/public/profiles/{id}/articles",
+    "get",
+    "Bounded approved article metadata for this profile; q, subject, limit and offset filters. No global feed.",
+  ],
+  [
+    "/v1/public/assets/{id}",
+    "get",
+    "Ready separately approved publication copy, current audience checked on every read. Clean PNG/JPEG images only inline; documents are forced downloads.",
+  ],
 ] as const)
   paths[path] = {
     [method]: {
@@ -306,7 +323,7 @@ upload.post.parameters = [
     required: true,
     schema: { type: "string", maxLength: 200 },
   },
-  ...["postId", "messageId"].map((name) => ({
+  ...["postId", "messageId", "articleRevisionId", "profileId"].map((name) => ({
     name,
     in: "query",
     required: false,
@@ -327,6 +344,33 @@ upload.post.requestBody = {
     ].map((type) => [type, { schema: { type: "string", format: "binary" } }]),
   ),
 };
+const articleResponse = {
+  description:
+    "Approved article projection; no draft, raw private attachment URL, student data or internal statistics.",
+  content: {
+    "application/json": {
+      schema: schema(
+        z
+          .object({
+            data: publishedArticle
+              .omit({ body: true })
+              .extend({ bodyHtml: z.string() }),
+          })
+          .strict(),
+      ),
+    },
+  },
+};
+(
+  paths["/v1/public/articles/{id}"] as {
+    get: { responses: Record<string, unknown> };
+  }
+).get.responses[200] = articleResponse;
+(
+  paths["/v1/articles/detail"] as {
+    post: { responses: Record<string, unknown> };
+  }
+).post.responses[200] = articleResponse;
 for (const [path, item] of Object.entries(paths)) {
   const names = [...path.matchAll(/\{([^}]+)\}/g)].map((m) => m[1]);
   if (!names.length) continue;

@@ -4,9 +4,13 @@ import { ApiError, rpc, type Env, type Session } from "./platform";
 export async function upload(request: Request, env: Env, s: Session) {
   const url = new URL(request.url);
   const postId = url.searchParams.get("postId"),
-    messageId = url.searchParams.get("messageId");
+    messageId = url.searchParams.get("messageId"),
+    articleRevisionId = url.searchParams.get("articleRevisionId"),
+    profileId = url.searchParams.get("profileId");
   if (postId) uuid.parse(postId);
   if (messageId) uuid.parse(messageId);
+  if (articleRevisionId) uuid.parse(articleRevisionId);
+  if (profileId) uuid.parse(profileId);
   if (!request.body) throw new ApiError(400, "BODY_REQUIRED");
   const parts: Uint8Array[] = [];
   let size = 0;
@@ -56,6 +60,8 @@ export async function upload(request: Request, env: Env, s: Session) {
     {
       postId,
       messageId,
+      articleRevisionId,
+      profileId,
       filename: validated.filename,
       type: validated.detectedType,
       size,

@@ -78,6 +78,11 @@ export async function consume(
         message.ack();
         continue;
       }
+      if (job.kind === "asset_copy" || job.kind === "asset_cleanup") {
+        await publicationAsset(env, job);
+        message.ack();
+        continue;
+      }
       if (job.kind === "export") {
         await exportReport(env, job);
         message.ack();
@@ -173,6 +178,16 @@ export async function consume(
 }
 export async function scheduled(env: Env) {
   await rpc(env, "runtime_sweep", {});
+  const assets = await rpc<{ id: string; objectKey: string }[]>(
+    env,
+    "runtime_asset_cleanup_candidates",
+    {},
+  );
+  for (const asset of assets) await env.FILES.delete(asset.objectKey);
+  if (assets.length)
+    await rpc(env, "runtime_asset_cleanup_done", {
+      ids: assets.map((asset) => asset.id),
+    });
   const expired = await rpc<string[]>(env, "runtime_cleanup", {});
   for (const key of expired) {
     await env.FILES.delete(key);
@@ -200,6 +215,59 @@ export async function scheduled(env: Env) {
   );
   for (let i = 0; i < jobs.length; i += 100)
     await env.JOBS.sendBatch(jobs.slice(i, i + 100).map((body) => ({ body })));
+}
+
+async function publicationAsset(env: Env, job: Job) {
+  const plan = await rpc<{
+    id: string;
+    objectKey: string;
+    sourceKey?: string;
+    checksum?: string;
+    size?: number;
+    type?: string;
+  } | null>(env, "runtime_asset_plan", {
+    jobId: job.id,
+    runToken: job.runToken,
+  });
+  if (plan) {
+    if (!plan.objectKey.startsWith(`${job.schoolId}/publications/`))
+      throw new ApiError(503, "ASSET_KEY_INVALID");
+    if (job.kind === "asset_cleanup") await env.FILES.delete(plan.objectKey);
+    else {
+      if (
+        !plan.sourceKey?.startsWith(`${job.schoolId}/`) ||
+        !plan.size ||
+        plan.size > 10485760
+      )
+        throw new ApiError(503, "ASSET_SOURCE_INVALID");
+      const object = await env.FILES.get(plan.sourceKey);
+      if (!object || object.size !== plan.size)
+        throw new ApiError(503, "ASSET_SOURCE_UNAVAILABLE");
+      const bytes = await object.arrayBuffer();
+      const checksum = Array.from(
+        new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
+        (value) => value.toString(16).padStart(2, "0"),
+      ).join("");
+      if (checksum !== plan.checksum)
+        throw new ApiError(503, "ASSET_CHECKSUM_MISMATCH");
+      await env.FILES.put(plan.objectKey, bytes, {
+        httpMetadata: { contentType: plan.type ?? "application/octet-stream" },
+        customMetadata: { checksum, assetId: plan.id },
+      });
+    }
+    const accepted = await rpc<boolean>(env, "runtime_asset_finish", {
+      jobId: job.id,
+      runToken: job.runToken,
+    });
+    if (!accepted && job.kind === "asset_copy")
+      await env.FILES.delete(plan.objectKey);
+  }
+  await rpc(env, "runtime_finish", {
+    id: job.id,
+    runToken: job.runToken,
+    status: "done",
+    result: { assetId: job.payload.assetId },
+  });
 }
 
 async function scan(env: Env, job: Job) {

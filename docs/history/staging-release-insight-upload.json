@@ -1,0 +1,39 @@
+{
+  "environment": "staging",
+  "accountId": "e746f9041a0f5eddfd51c206531b3393",
+  "commit": "41dd22478e548d975bdc13ebf4f929586844f74c",
+  "migrationVersion": "20261108224740",
+  "migrationDigest": "1d7ea2958d5cdec359f52fd6748f119ed1a54f0dccb882ca7fce82afbb4edf5a",
+  "startedAt": "2026-11-08T22:55:44.788Z",
+  "deployed": true,
+  "serverKeyMetadata": {
+    "kind": "secret",
+    "formatValid": true
+  },
+  "resources": {
+    "bucket": "papperly-staging-private",
+    "bucketCreated": false,
+    "privateAccessVerified": true,
+    "queue": "papperly-staging-jobs",
+    "queueId": "f80c4cea111642e9aa2e0794d3854f2c",
+    "queueCreated": false
+  },
+  "supabaseServiceKeyVerified": true,
+  "billing": {
+    "planReadAvailable": false,
+    "upgradePerformed": false,
+    "zeroSpendOnly": true,
+    "spendingCapUsd": 0,
+    "accountBillingVerification": "unavailable; no claim of a verified account billing cap"
+  },
+  "previousDeploymentId": "4d94d21b-ab35-4919-858b-28637719db18",
+  "apiUrl": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
+  "deploymentId": "27b1631e-5f38-49f3-b3f0-813f834964e8",
+  "bindingsVerified": true,
+  "scheduleConfigured": true,
+  "queueConsumerConfigured": true,
+  "basicSmokePassed": true,
+  "completedAt": "2026-11-08T22:55:54.841Z",
+  "limitations": "Basic release smoke only; full multi-role, scheduled/queue processing, file, external-provider and load/restore acceptance remains outstanding. No real student provisioning or frontend deployed.",
+  "workflowRun": 42532538728
+}

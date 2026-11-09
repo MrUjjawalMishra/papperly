@@ -62,7 +62,13 @@ export const operations = {
   },
   "accounts/deactivate": {
     rpc: "deactivate_user",
-    schema: z.object({ userId: uuid, reason: short }).strict(),
+    schema: z
+      .object({
+        userId: uuid,
+        reason: short,
+        articlePolicy: z.enum(["retain", "unpublish"]).optional(),
+      })
+      .strict(),
   },
   "accounts/force-logout": {
     rpc: "force_logout",
@@ -124,6 +130,7 @@ export const operations = {
         teacherId: uuid.optional(),
         profileId: uuid.optional(),
         revisionId: uuid.optional(),
+        photoAttachmentId: uuid.optional(),
         displayName: short.optional(),
         designation: short.optional(),
         subjects: z.array(short).optional(),
@@ -257,6 +264,10 @@ export const operations = {
     schema: z.object({ draftId: uuid }).strict(),
   },
   "jobs/status": { rpc: "job_status", schema: z.object({ id: uuid }).strict() },
+  "files/status": {
+    rpc: "file_status",
+    schema: z.object({ id: uuid }).strict(),
+  },
   "dashboard/student": { rpc: "student_home", schema: z.object({}).strict() },
   "groups/posts/read": {
     rpc: "read_post",
@@ -381,6 +392,10 @@ export const operations = {
         designation: short,
         qualifications: text,
         experience: text,
+        contact: z
+          .object({ kind: z.enum(["email", "url", "office"]), value: short })
+          .strict()
+          .optional(),
         reason: short,
       })
       .strict(),
@@ -529,6 +544,7 @@ export const operations = {
         subject: short,
         body: text,
         state: z.enum(["draft", "submitted"]),
+        reason: short.optional(),
       })
       .strict(),
   },
@@ -538,9 +554,54 @@ export const operations = {
       .object({
         articleId: uuid,
         revisionId: uuid.optional(),
-        action: z.enum(["publish", "unpublish", "changes_requested"]),
+        action: z.enum([
+          "publish",
+          "unpublish",
+          "archive",
+          "changes_requested",
+        ]),
+        revision: rev.optional(),
         audience: z.enum(["school", "public"]).optional(),
+        assetIds: z.array(uuid).max(5).optional(),
         reason: short,
+      })
+      .strict(),
+  },
+  "articles/trusted-publisher": {
+    rpc: "manage_publisher",
+    schema: z
+      .object({
+        teacherId: uuid,
+        audience: z.enum(["school", "public"]),
+        action: z.enum(["grant", "revoke"]),
+        expiresAt: z.string().datetime().optional(),
+        reason: short,
+      })
+      .strict(),
+  },
+  "articles/detail": {
+    rpc: "article_detail",
+    schema: z.object({ articleId: uuid }).strict(),
+  },
+  "publications/status": {
+    rpc: "publication_status",
+    schema: z
+      .object({ articleId: uuid.optional(), profileId: uuid.optional() })
+      .strict(),
+  },
+  "publications/retry": {
+    rpc: "retry_publication_asset",
+    schema: z.object({ id: uuid, reason: short }).strict(),
+  },
+  "articles/list": {
+    rpc: "profile_articles",
+    schema: z
+      .object({
+        profileId: uuid,
+        subject: short.optional(),
+        q: z.string().max(100).optional(),
+        limit: z.number().int().min(1).max(100).optional(),
+        offset: z.number().int().min(0).max(10000).optional(),
       })
       .strict(),
   },

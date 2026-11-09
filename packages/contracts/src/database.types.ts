@@ -98,6 +98,7 @@ export type Database = {
       };
       attachments: {
         Row: {
+          article_revision_id: string | null;
           charged: boolean;
           checksum: string;
           created_at: string;
@@ -107,6 +108,7 @@ export type Database = {
           id: string;
           object_key: string;
           post_id: string | null;
+          profile_id: string | null;
           query_message_id: string | null;
           school_id: string;
           size: number;
@@ -114,6 +116,7 @@ export type Database = {
           uploader_id: string;
         };
         Insert: {
+          article_revision_id?: string | null;
           charged?: boolean;
           checksum: string;
           created_at?: string;
@@ -123,6 +126,7 @@ export type Database = {
           id?: string;
           object_key: string;
           post_id?: string | null;
+          profile_id?: string | null;
           query_message_id?: string | null;
           school_id: string;
           size: number;
@@ -130,6 +134,7 @@ export type Database = {
           uploader_id: string;
         };
         Update: {
+          article_revision_id?: string | null;
           charged?: boolean;
           checksum?: string;
           created_at?: string;
@@ -139,6 +144,7 @@ export type Database = {
           id?: string;
           object_key?: string;
           post_id?: string | null;
+          profile_id?: string | null;
           query_message_id?: string | null;
           school_id?: string;
           size?: number;
@@ -146,6 +152,20 @@ export type Database = {
           uploader_id?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "attachments_article_revision_id_fkey";
+            columns: ["article_revision_id"];
+            isOneToOne: false;
+            referencedRelation: "article_revisions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "attachments_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "teacher_profiles";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "attachments_school_id_fkey";
             columns: ["school_id"];
@@ -1251,35 +1271,111 @@ export type Database = {
       public_assets: {
         Row: {
           approved: boolean;
+          attachment_id: string | null;
+          charged: boolean;
+          checksum: string | null;
+          cleanup_checked_at: string | null;
+          declared_type: string | null;
+          filename: string | null;
           id: string;
           object_key: string;
           publication_id: string;
           revoked_at: string | null;
           school_id: string;
+          size: number | null;
+          state: string;
         };
         Insert: {
           approved?: boolean;
+          attachment_id?: string | null;
+          charged?: boolean;
+          checksum?: string | null;
+          cleanup_checked_at?: string | null;
+          declared_type?: string | null;
+          filename?: string | null;
           id?: string;
           object_key: string;
           publication_id: string;
           revoked_at?: string | null;
           school_id: string;
+          size?: number | null;
+          state?: string;
         };
         Update: {
           approved?: boolean;
+          attachment_id?: string | null;
+          charged?: boolean;
+          checksum?: string | null;
+          cleanup_checked_at?: string | null;
+          declared_type?: string | null;
+          filename?: string | null;
           id?: string;
           object_key?: string;
           publication_id?: string;
           revoked_at?: string | null;
           school_id?: string;
+          size?: number | null;
+          state?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "public_assets_attachment_id_fkey";
+            columns: ["attachment_id"];
+            isOneToOne: false;
+            referencedRelation: "attachments";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "public_assets_publication_id_fkey";
             columns: ["publication_id"];
             isOneToOne: false;
             referencedRelation: "content_publications";
             referencedColumns: ["id"];
+          },
+        ];
+      };
+      publisher_grants: {
+        Row: {
+          audience: string;
+          expires_at: string | null;
+          granted_by: string;
+          revision: number;
+          revoked_at: string | null;
+          school_id: string;
+          teacher_id: string;
+        };
+        Insert: {
+          audience: string;
+          expires_at?: string | null;
+          granted_by: string;
+          revision?: number;
+          revoked_at?: string | null;
+          school_id: string;
+          teacher_id: string;
+        };
+        Update: {
+          audience?: string;
+          expires_at?: string | null;
+          granted_by?: string;
+          revision?: number;
+          revoked_at?: string | null;
+          school_id?: string;
+          teacher_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "publisher_grants_school_id_granted_by_fkey";
+            columns: ["school_id", "granted_by"];
+            isOneToOne: false;
+            referencedRelation: "memberships";
+            referencedColumns: ["school_id", "id"];
+          },
+          {
+            foreignKeyName: "publisher_grants_school_id_teacher_id_fkey";
+            columns: ["school_id", "teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "memberships";
+            referencedColumns: ["school_id", "id"];
           },
         ];
       };
@@ -1896,6 +1992,7 @@ export type Database = {
       teacher_articles: {
         Row: {
           archived: boolean;
+          archived_author: boolean;
           audience: string;
           author_id: string;
           id: string;
@@ -1907,6 +2004,7 @@ export type Database = {
         };
         Insert: {
           archived?: boolean;
+          archived_author?: boolean;
           audience?: string;
           author_id: string;
           id?: string;
@@ -1918,6 +2016,7 @@ export type Database = {
         };
         Update: {
           archived?: boolean;
+          archived_author?: boolean;
           audience?: string;
           author_id?: string;
           id?: string;
@@ -2031,8 +2130,10 @@ export type Database = {
       teacher_profiles: {
         Row: {
           approved_fields: Json;
+          approved_revision: string | null;
           audience: string;
           classes: string[];
+          contact_info: Json;
           designation: string;
           display_name: string;
           id: string;
@@ -2045,8 +2146,10 @@ export type Database = {
         };
         Insert: {
           approved_fields?: Json;
+          approved_revision?: string | null;
           audience?: string;
           classes?: string[];
+          contact_info?: Json;
           designation?: string;
           display_name: string;
           id?: string;
@@ -2059,8 +2162,10 @@ export type Database = {
         };
         Update: {
           approved_fields?: Json;
+          approved_revision?: string | null;
           audience?: string;
           classes?: string[];
+          contact_info?: Json;
           designation?: string;
           display_name?: string;
           id?: string;
@@ -2072,6 +2177,13 @@ export type Database = {
           visible?: boolean;
         };
         Relationships: [
+          {
+            foreignKeyName: "teacher_profiles_approved_revision_fkey";
+            columns: ["approved_revision"];
+            isOneToOne: false;
+            referencedRelation: "profile_revisions";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "teacher_profiles_school_id_teacher_id_fkey";
             columns: ["school_id", "teacher_id"];
@@ -2116,6 +2228,7 @@ export type Database = {
     };
     Functions: {
       archive_group: { Args: { p: Json }; Returns: undefined };
+      article_detail: { Args: { p: Json }; Returns: Json };
       assign_teacher: { Args: { p: Json }; Returns: undefined };
       assigned_directory: { Args: { p: Json }; Returns: Json };
       cancel_exam: { Args: { p: Json }; Returns: undefined };
@@ -2135,6 +2248,7 @@ export type Database = {
       end_support: { Args: { p: Json }; Returns: undefined };
       enroll_student: { Args: { p: Json }; Returns: undefined };
       export_download: { Args: { p: Json }; Returns: Json };
+      file_status: { Args: { p: Json }; Returns: Json };
       force_logout: { Args: { p: Json }; Returns: undefined };
       formatting_input: { Args: { p: Json }; Returns: Json };
       import_row_outcome: { Args: { p: Json }; Returns: undefined };
@@ -2144,6 +2258,7 @@ export type Database = {
       learning_statistics: { Args: { p: Json }; Returns: Json };
       manage_coteacher: { Args: { p: Json }; Returns: undefined };
       manage_profile: { Args: { p: Json }; Returns: string };
+      manage_publisher: { Args: { p: Json }; Returns: undefined };
       manage_term: { Args: { p: Json }; Returns: string };
       mark_notification: { Args: { p: Json }; Returns: undefined };
       moderate_article: { Args: { p: Json }; Returns: undefined };
@@ -2152,7 +2267,10 @@ export type Database = {
       prepare_credential_action: { Args: { p: Json }; Returns: Json };
       preview_import: { Args: { p: Json }; Returns: Json };
       professional_update: { Args: { p: Json }; Returns: string };
+      profile_articles: { Args: { p: Json }; Returns: Json };
       profile_detail: { Args: { p: Json }; Returns: Json };
+      publication_asset: { Args: { p: Json }; Returns: Json };
+      publication_status: { Args: { p: Json }; Returns: Json };
       publish_exam: { Args: { p: Json }; Returns: string };
       publish_result: { Args: { p: Json }; Returns: string };
       query_archive: { Args: { p: Json }; Returns: Json };
@@ -2165,10 +2283,15 @@ export type Database = {
       request_formatting: { Args: { p: Json }; Returns: string };
       reserve_account: { Args: { p: Json }; Returns: Json };
       reserve_upload: { Args: { p: Json }; Returns: Json };
+      retry_publication_asset: { Args: { p: Json }; Returns: undefined };
       review_details: { Args: { p: Json }; Returns: Json };
       review_grade: { Args: { p: Json }; Returns: undefined };
       review_integrity: { Args: { p: Json }; Returns: undefined };
       revise_deadline: { Args: { p: Json }; Returns: undefined };
+      runtime_asset_cleanup_candidates: { Args: { p: Json }; Returns: Json };
+      runtime_asset_cleanup_done: { Args: { p: Json }; Returns: undefined };
+      runtime_asset_finish: { Args: { p: Json }; Returns: boolean };
+      runtime_asset_plan: { Args: { p: Json }; Returns: Json };
       runtime_claim: { Args: { p: Json }; Returns: Json };
       runtime_cleanup: { Args: { p: Json }; Returns: Json };
       runtime_credentials: { Args: { p: Json }; Returns: Json };

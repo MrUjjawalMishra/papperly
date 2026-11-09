@@ -539,6 +539,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 200
+                  },
+                  "articlePolicy": {
+                    "type": "string",
+                    "enum": ["retain", "unpublish"]
                   }
                 },
                 "required": ["userId", "reason"],
@@ -1117,6 +1121,10 @@
                     "format": "uuid"
                   },
                   "revisionId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "photoAttachmentId": {
                     "type": "string",
                     "format": "uuid"
                   },
@@ -2108,6 +2116,71 @@
       "post": {
         "operationId": "job_status",
         "tags": ["jobs"],
+        "description": "Authorization is enforced by checked PostgreSQL RPC and RLS. See docs/api.md and backend-requirements.md for role/scope and idempotency rules.",
+        "security": [
+          {
+            "sessionCookie": [],
+            "csrf": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": ["id"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation. Database UTC timestamps are ISO 8601; marks are integer hundredths.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {}
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/files/status": {
+      "post": {
+        "operationId": "file_status",
+        "tags": ["files"],
         "description": "Authorization is enforced by checked PostgreSQL RPC and RLS. See docs/api.md and backend-requirements.md for role/scope and idempotency rules.",
         "security": [
           {
@@ -3371,6 +3444,22 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 20000
+                  },
+                  "contact": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "enum": ["email", "url", "office"]
+                      },
+                      "value": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      }
+                    },
+                    "required": ["kind", "value"],
+                    "additionalProperties": false
                   },
                   "reason": {
                     "type": "string",
@@ -5755,6 +5844,11 @@
                   "state": {
                     "type": "string",
                     "enum": ["draft", "submitted"]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
                   }
                 },
                 "required": [
@@ -5834,11 +5928,29 @@
                   },
                   "action": {
                     "type": "string",
-                    "enum": ["publish", "unpublish", "changes_requested"]
+                    "enum": [
+                      "publish",
+                      "unpublish",
+                      "archive",
+                      "changes_requested"
+                    ]
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "exclusiveMinimum": true,
+                    "minimum": 0
                   },
                   "audience": {
                     "type": "string",
                     "enum": ["school", "public"]
+                  },
+                  "assetIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "maxItems": 5
                   },
                   "reason": {
                     "type": "string",
@@ -5847,6 +5959,466 @@
                   }
                 },
                 "required": ["articleId", "action", "reason"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation. Database UTC timestamps are ISO 8601; marks are integer hundredths.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {}
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/articles/trusted-publisher": {
+      "post": {
+        "operationId": "manage_publisher",
+        "tags": ["articles"],
+        "description": "Authorization is enforced by checked PostgreSQL RPC and RLS. See docs/api.md and backend-requirements.md for role/scope and idempotency rules.",
+        "security": [
+          {
+            "sessionCookie": [],
+            "csrf": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "teacherId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "audience": {
+                    "type": "string",
+                    "enum": ["school", "public"]
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": ["grant", "revoke"]
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  }
+                },
+                "required": ["teacherId", "audience", "action", "reason"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation. Database UTC timestamps are ISO 8601; marks are integer hundredths.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {}
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/articles/detail": {
+      "post": {
+        "operationId": "article_detail",
+        "tags": ["articles"],
+        "description": "Authorization is enforced by checked PostgreSQL RPC and RLS. See docs/api.md and backend-requirements.md for role/scope and idempotency rules.",
+        "security": [
+          {
+            "sessionCookie": [],
+            "csrf": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "articleId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": ["articleId"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Approved article projection; no draft, raw private attachment URL, student data or internal statistics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "revisionId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        "summary": {
+                          "type": "string",
+                          "maxLength": 20000
+                        },
+                        "subject": {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        "author": {
+                          "type": "object",
+                          "properties": {
+                            "displayName": {
+                              "type": "string"
+                            },
+                            "archived": {
+                              "type": "boolean"
+                            },
+                            "profileId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "nullable": true
+                            }
+                          },
+                          "required": ["displayName", "archived", "profileId"],
+                          "additionalProperties": false
+                        },
+                        "audience": {
+                          "type": "string",
+                          "enum": ["school", "public"]
+                        },
+                        "publishedAt": {
+                          "type": "string"
+                        },
+                        "indexingEnabled": {
+                          "type": "boolean"
+                        },
+                        "assets": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "filename": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["id", "filename", "type"],
+                            "additionalProperties": false
+                          },
+                          "maxItems": 5
+                        },
+                        "bodyHtml": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "revisionId",
+                        "title",
+                        "summary",
+                        "subject",
+                        "author",
+                        "audience",
+                        "publishedAt",
+                        "indexingEnabled",
+                        "assets",
+                        "bodyHtml"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["data"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/publications/status": {
+      "post": {
+        "operationId": "publication_status",
+        "tags": ["publications"],
+        "description": "Authorization is enforced by checked PostgreSQL RPC and RLS. See docs/api.md and backend-requirements.md for role/scope and idempotency rules.",
+        "security": [
+          {
+            "sessionCookie": [],
+            "csrf": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "articleId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "profileId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation. Database UTC timestamps are ISO 8601; marks are integer hundredths.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {}
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/publications/retry": {
+      "post": {
+        "operationId": "retry_publication_asset",
+        "tags": ["publications"],
+        "description": "Authorization is enforced by checked PostgreSQL RPC and RLS. See docs/api.md and backend-requirements.md for role/scope and idempotency rules.",
+        "security": [
+          {
+            "sessionCookie": [],
+            "csrf": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  }
+                },
+                "required": ["id", "reason"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation. Database UTC timestamps are ISO 8601; marks are integer hundredths.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {}
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/articles/list": {
+      "post": {
+        "operationId": "profile_articles",
+        "tags": ["articles"],
+        "description": "Authorization is enforced by checked PostgreSQL RPC and RLS. See docs/api.md and backend-requirements.md for role/scope and idempotency rules.",
+        "security": [
+          {
+            "sessionCookie": [],
+            "csrf": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profileId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  }
+                },
+                "required": ["profileId"],
                 "additionalProperties": false
               }
             }
@@ -9155,6 +9727,26 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "articleRevisionId",
+            "in": "query",
+            "required": false,
+            "description": "Supply exactly one parent ID.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "profileId",
+            "in": "query",
+            "required": false,
+            "description": "Supply exactly one parent ID.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -9328,6 +9920,231 @@
         "responses": {
           "200": {
             "description": "Approved public profile projection only."
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/public/articles/{id}": {
+      "get": {
+        "operationId": "_v1_public_articles_id_get",
+        "description": "Approved article for its current audience; optional session for school access. BodyHtml uses restricted Markdown with raw HTML/images disabled. No-store; indexing requires explicit school policy.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Approved article projection; no draft, raw private attachment URL, student data or internal statistics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "revisionId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        "summary": {
+                          "type": "string",
+                          "maxLength": 20000
+                        },
+                        "subject": {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        "author": {
+                          "type": "object",
+                          "properties": {
+                            "displayName": {
+                              "type": "string"
+                            },
+                            "archived": {
+                              "type": "boolean"
+                            },
+                            "profileId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "nullable": true
+                            }
+                          },
+                          "required": ["displayName", "archived", "profileId"],
+                          "additionalProperties": false
+                        },
+                        "audience": {
+                          "type": "string",
+                          "enum": ["school", "public"]
+                        },
+                        "publishedAt": {
+                          "type": "string"
+                        },
+                        "indexingEnabled": {
+                          "type": "boolean"
+                        },
+                        "assets": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "filename": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["id", "filename", "type"],
+                            "additionalProperties": false
+                          },
+                          "maxItems": 5
+                        },
+                        "bodyHtml": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "revisionId",
+                        "title",
+                        "summary",
+                        "subject",
+                        "author",
+                        "audience",
+                        "publishedAt",
+                        "indexingEnabled",
+                        "assets",
+                        "bodyHtml"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["data"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/public/profiles/{id}/articles": {
+      "get": {
+        "operationId": "_v1_public_profiles_id_articles_get",
+        "description": "Bounded approved article metadata for this profile; q, subject, limit and offset filters. No global feed.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Bounded approved article metadata for this profile; q, subject, limit and offset filters. No global feed."
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/public/assets/{id}": {
+      "get": {
+        "operationId": "_v1_public_assets_id_get",
+        "description": "Ready separately approved publication copy, current audience checked on every read. Clean PNG/JPEG images only inline; documents are forced downloads.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Ready separately approved publication copy, current audience checked on every read. Clean PNG/JPEG images only inline; documents are forced downloads."
           },
           "400": {
             "$ref": "#/components/responses/Error"

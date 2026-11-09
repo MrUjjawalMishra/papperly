@@ -1,10 +1,10 @@
 {
   "environment": "staging",
   "accountId": "e746f9041a0f5eddfd51c206531b3393",
-  "commit": "af443c72454c4fd033a136d5054f068306c451fd",
-  "migrationVersion": "20261108060326",
-  "migrationDigest": "6ea814a8ffa64dba82da217485d844dd521afb5c9993db59854a09d94fd24ad2",
-  "startedAt": "2026-11-08T09:01:38.003Z",
+  "commit": "41dd22478e548d975bdc13ebf4f929586844f74c",
+  "migrationVersion": "20261108224740",
+  "migrationDigest": "1d7ea2958d5cdec359f52fd6748f119ed1a54f0dccb882ca7fce82afbb4edf5a",
+  "startedAt": "2026-11-08T22:55:44.788Z",
   "deployed": true,
   "serverKeyMetadata": {
     "kind": "secret",
@@ -21,17 +21,19 @@
   "supabaseServiceKeyVerified": true,
   "billing": {
     "planReadAvailable": false,
-    "upgradePerformed": false
+    "upgradePerformed": false,
+    "zeroSpendOnly": true,
+    "spendingCapUsd": 0,
+    "accountBillingVerification": "unavailable; no claim of a verified account billing cap"
   },
-  "previousDeploymentId": "bc2a71db-08d1-4c6c-a317-8b1dca8fb8d7",
+  "previousDeploymentId": "4d94d21b-ab35-4919-858b-28637719db18",
   "apiUrl": "https://papperly-api-staging.mr-ujjawalmishra.workers.dev",
-  "deploymentId": "0c02f334-ff4e-46ec-be29-332fe18d73ed",
+  "deploymentId": "27b1631e-5f38-49f3-b3f0-813f834964e8",
   "bindingsVerified": true,
   "scheduleConfigured": true,
   "queueConsumerConfigured": true,
   "basicSmokePassed": true,
-  "completedAt": "2026-11-08T09:01:46.519Z",
+  "completedAt": "2026-11-08T22:55:54.841Z",
   "limitations": "Basic release smoke only; full multi-role, scheduled/queue processing, file, external-provider and load/restore acceptance remains outstanding. No real student provisioning or frontend deployed.",
-  "workflowRun": 42465304448,
-  "workerVersion": "faa3fdee-f47c-4eea-b72f-7f7a74253449"
+  "workflowRun": 42532538728
 }

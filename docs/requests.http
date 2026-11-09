@@ -96,4 +96,195 @@ Content-Type: application/json
 {}
 
 # Complete operation request schemas are in openapi.json. This sample collection
-# does not yet exercise every group/import/query/profile/owner workflow end-to-end.
+# contains role-scoped examples; use the complete OpenAPI schemas for ancillary operations.
+
+### Additional role workflows; switch the authenticated cookie jar for each role.
+# Replace UUID variables with prior API responses. No credentials are stored here.
+@school = SCHOOL_UUID
+@class = CLASS_UUID
+@teacher = TEACHER_UUID
+@student = STUDENT_UUID
+@group = GROUP_UUID
+@query = QUERY_UUID
+@profile = PROFILE_UUID
+@article = ARTICLE_UUID
+@articleRevision = ARTICLE_REVISION_UUID
+@attachment = ATTACHMENT_UUID
+
+### Administrator creates a class
+POST {{base}}/v1/classes
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"academicYear":"2026","name":"9","section":"B"}
+
+### Parent-role provisioning: owner issues an administrator; administrator issues a teacher
+# Use the appropriate role/class fields from OpenAPI; credentials are issue-only.
+POST {{base}}/v1/accounts
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"schoolId":"{{school}}","role":"teacher","name":"Synthetic Teacher","loginId":"Synthetic.Teacher","identityKey":"synthetic-teacher-example"}
+
+### Administrator assigns the teacher
+POST {{base}}/v1/assignments
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"teacherId":"{{teacher}}","classId":"{{class}}","subject":"Computing"}
+
+### Teacher/admin downloads the Excel template; populate synthetic rows only
+GET {{base}}/v1/imports/template
+
+### Teacher previews an XLSX file without provisioning
+POST {{base}}/v1/imports/preview?classId={{class}}
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Idempotency-Key: SYNTHETIC_IMPORT_REQUEST_UUID
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ./SYNTHETIC_ROSTER.xlsx
+
+### Confirm selected preview rows; continue remainingRows until complete
+POST {{base}}/v1/imports/confirm
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"jobId":"IMPORT_JOB_UUID","rows":[2,3]}
+
+### Teacher creates a group
+POST {{base}}/v1/groups
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"classId":"{{class}}","subject":"Computing","title":"Synthetic study group"}
+
+### Teacher approves a student membership
+POST {{base}}/v1/groups/members
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"groupId":"{{group}}","studentId":"{{student}}","state":"active"}
+
+### Student sends a private assigned-teacher query
+POST {{base}}/v1/queries
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"teacherId":"{{teacher}}","classId":"{{class}}","subject":"Computing","topic":"Loops","body":"Synthetic question about loop conditions"}
+
+### Teacher replies; use kind=solution only for an actual proposed solution
+POST {{base}}/v1/queries/replies
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"queryId":"{{query}}","kind":"solution","body":"Synthetic teaching explanation"}
+
+### Student resolves the current query cycle
+POST {{base}}/v1/queries/state
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"queryId":"{{query}}","state":"resolved","reason":"Explanation understood"}
+
+### Authorized student dashboard data; blocked during an active attempt
+POST {{base}}/v1/dashboard/student
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{}
+
+### Teacher submits an article revision (school review is the default)
+POST {{base}}/v1/articles/revisions
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"profileId":"{{profile}}","title":"Synthetic loop lesson","summary":"A short teaching explanation","subject":"Computing","body":"Practise **loop conditions**.","state":"submitted"}
+
+### Independent article upload; a private group-file ID cannot replace this step
+POST {{base}}/v1/files/upload?articleRevisionId={{articleRevision}}
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Idempotency-Key: SYNTHETIC_PUBLICATION_UPLOAD_UUID
+X-Filename: synthetic.pdf
+Content-Type: application/pdf
+
+< ./SYNTHETIC_DOCUMENT.pdf
+
+### Poll authorized scan/job state; never treat unavailable scanning as clean
+POST {{base}}/v1/files/status
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"id":"{{attachment}}"}
+
+### Administrator explicitly approves text and independently uploaded clean assets
+POST {{base}}/v1/articles/moderation
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"articleId":"{{article}}","revisionId":"{{articleRevision}}","action":"publish","audience":"school","assetIds":["{{attachment}}"],"reason":"School reviewed text and attachment"}
+
+### Approved article read; the session still authorizes school-visible content
+GET {{base}}/v1/public/articles/{{article}}
+
+### Administrator requests a UTF-8 printable report; download only after the export is ready
+POST {{base}}/v1/reports/exports
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"studentId":"{{student}}","format":"printable","academicYear":"2026"}
+
+### Platform owner sign-in uses the same secure session lifecycle
+POST {{base}}/v1/auth/owner-login
+Origin: https://APPROVED_FRONTEND_ORIGIN
+Content-Type: application/json
+
+{"schoolCode":"platform","loginId":"owner","password":"{{password}}"}
+
+### Staff resets an authorized student; currentPassword is the staff actor's password
+# Response issues a new password once and invalidates the student's old sessions.
+POST {{base}}/v1/auth/password
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"userId":"{{student}}","currentPassword":"{{password}}","reason":"Authorized synthetic reset exercise"}
+
+### Administrator creates a school-controlled teacher profile
+POST {{base}}/v1/profiles/manage
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"action":"create","teacherId":"{{teacher}}","displayName":"Synthetic Teacher","designation":"Teacher","subjects":[],"classes":[],"reason":"Create synthetic directory entry"}
+
+### Teacher submits a biography for school review
+POST {{base}}/v1/profiles/manage
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"action":"draft","profileId":"{{profile}}","content":{"biography":"Synthetic biography for review","teachingApproach":"Synthetic teaching approach","qualifications":"Proposed qualification for school verification","experience":"Proposed experience for school verification"},"reason":"Submit biography for review"}
+
+### Administrator approves only the intended audience; public also requires school public policy
+POST {{base}}/v1/profiles/manage
+Origin: https://APPROVED_FRONTEND_ORIGIN
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{"action":"approve","profileId":"{{profile}}","revisionId":"PROFILE_REVISION_UUID","audience":"school","reason":"School reviewed biography"}

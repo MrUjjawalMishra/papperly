@@ -1,4 +1,5 @@
 import { geminiConfigured } from "./gemini";
+import { articleProjection } from "./articles";
 import { z, ZodError } from "zod";
 import { login, uuid } from "../../../packages/contracts/src/index";
 import {
@@ -205,21 +206,106 @@ export async function handle(request: Request, env: Env): Promise<Response> {
       });
     }
     if (
-      url.pathname.startsWith("/v1/public/profiles/") &&
+      url.pathname.startsWith("/v1/public/assets/") &&
       request.method === "GET"
     ) {
-      await limited(request, env, "public-profile", 30);
+      await limited(request, env, "public-asset", 60);
+      const asset = await rpc<{
+        objectKey: string;
+        filename: string;
+        type: string;
+      }>(
+        env,
+        "publication_asset",
+        { id: uuid.parse(url.pathname.slice(18)) },
+        request.headers.get("Cookie")?.includes("__Host-papperly=")
+          ? (await session(request, env)).accessToken
+          : env.SUPABASE_ANON_KEY,
+      );
+      const object = await env.FILES.get(asset.objectKey);
+      if (!object) throw new ApiError(404, "ASSET_UNAVAILABLE");
+      const image = ["image/png", "image/jpeg"].includes(asset.type);
+      headers.set(
+        "Content-Type",
+        image ? asset.type : "application/octet-stream",
+      );
+      headers.set(
+        "Content-Disposition",
+        `${image ? "inline" : "attachment"}; filename="${asset.filename.replace(/[^a-zA-Z0-9._-]/g, "_")}"`,
+      );
+      headers.set("Content-Security-Policy", "default-src 'none'; sandbox");
+      headers.set("X-Robots-Tag", "noindex");
+      return new Response(object.body, { headers });
+    }
+    const profileArticles = url.pathname.match(
+      /^\/v1\/public\/profiles\/([^/]+)\/articles$/,
+    );
+    if (profileArticles && request.method === "GET") {
+      await limited(request, env, "public-articles", 30);
+      const input = operations["articles/list"].schema.parse({
+        profileId: profileArticles[1],
+        ...(url.searchParams.has("q") ? { q: url.searchParams.get("q") } : {}),
+        ...(url.searchParams.has("subject")
+          ? { subject: url.searchParams.get("subject") }
+          : {}),
+        limit: Number(url.searchParams.get("limit") ?? 25),
+        offset: Number(url.searchParams.get("offset") ?? 0),
+      });
       headers.set("X-Robots-Tag", "noindex");
       return json({
         data: await rpc(
           env,
-          "profile_detail",
-          { profileId: uuid.parse(url.pathname.slice(20)) },
+          "profile_articles",
+          input,
           request.headers.get("Cookie")?.includes("__Host-papperly=")
             ? (await session(request, env)).accessToken
             : env.SUPABASE_ANON_KEY,
         ),
       });
+    }
+    if (
+      url.pathname.startsWith("/v1/public/articles/") &&
+      request.method === "GET"
+    ) {
+      await limited(request, env, "public-article", 30);
+      const article = articleProjection(
+        await rpc(
+          env,
+          "article_detail",
+          { articleId: uuid.parse(url.pathname.slice(20)) },
+          request.headers.get("Cookie")?.includes("__Host-papperly=")
+            ? (await session(request, env)).accessToken
+            : env.SUPABASE_ANON_KEY,
+        ),
+      );
+      headers.set(
+        "X-Robots-Tag",
+        article.audience === "public" && article.indexingEnabled
+          ? "index,follow"
+          : "noindex",
+      );
+      return json({ data: article });
+    }
+    if (
+      url.pathname.startsWith("/v1/public/profiles/") &&
+      request.method === "GET"
+    ) {
+      await limited(request, env, "public-profile", 30);
+      const profile = await rpc<{ audience: string; indexingEnabled: boolean }>(
+        env,
+        "profile_detail",
+        { profileId: uuid.parse(url.pathname.slice(20)) },
+        request.headers.get("Cookie")?.includes("__Host-papperly=")
+          ? (await session(request, env)).accessToken
+          : env.SUPABASE_ANON_KEY,
+      );
+      headers.set(
+        "X-Robots-Tag",
+        profile.audience === "public" && profile.indexingEnabled
+          ? "index,follow"
+          : "noindex",
+      );
+      return json({ data: profile });
     }
     const s = await session(request, env);
     await limited(request, env, "api:" + s.userId, 180);
@@ -321,7 +407,9 @@ export async function handle(request: Request, env: Env): Promise<Response> {
       );
       if (result && typeof result === "object" && "error" in result)
         throw new ApiError(409, String(result.error));
-      return json({ data: result });
+      return json({
+        data: op.rpc === "article_detail" ? articleProjection(result) : result,
+      });
     }
     if (request.method === "GET" && route in readTables) {
       const spec = readTables[route as keyof typeof readTables];

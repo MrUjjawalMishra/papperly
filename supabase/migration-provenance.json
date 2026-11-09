@@ -220,6 +220,20 @@
       "sha256": "25970c84eb82de31f1c2464dea47d80130f1dc01bbb5f0b430be84cf6420b991",
       "providerVersion": "20261108224740",
       "canonicalFile": "20261108224740_papperly_upload_idempotency.sql"
+    },
+    {
+      "file": "20261108225359_article_publication_lifecycle.sql",
+      "name": "papperly_article_publication_lifecycle",
+      "sha256": "c540e9fc3cbcbd656dc591e1c16a4e87c895586717c6235146aa71521e86c6ae",
+      "providerVersion": "20261108233959",
+      "canonicalFile": "20261108233959_papperly_article_publication_lifecycle.sql"
+    },
+    {
+      "file": "20261108230033_publication_assets.sql",
+      "name": "papperly_publication_assets",
+      "sha256": "e6903058f4b0bf5fa78f82df100474fcc40dbb525dc75c24fee556581b79ec34",
+      "providerVersion": "20261108235330",
+      "canonicalFile": "20261108235330_papperly_publication_assets.sql"
     }
   ]
 }
